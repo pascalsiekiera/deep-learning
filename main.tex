@@ -1,0 +1,145 @@
+%% Deep Learning 2026-27 course project: report template.
+%%
+%% Rules:
+%%  - At most 8 pages, or 10 pages if you attempt Part 4 (bonus), from the title to the end of
+%%    your last answer. References and appendices do not count.
+%%  - Do not change the font size, the margins, or the line spacing.
+%%  - Answer the questions in order, using their numbers (e.g., "Q2.3").
+%%  - Keep the contribution paragraph and the completed checklist.
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[round]{natbib}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=MidnightBlue, citecolor=MidnightBlue, urlcolor=MidnightBlue}
+
+\title{Deep Learning 2026-27: Course Project Report \\ \large Group XX}
+\author{
+  First Name Last Name (ist1xxxxxx) \and
+  First Name Last Name (ist1xxxxxx) \and
+  First Name Last Name (ist1xxxxxx)
+}
+\date{}
+
+\begin{document}
+\maketitle
+
+\paragraph{Contributions.}
+State clearly what each group member contributed (derivations, code, experiments, and writing).
+
+\section*{Part 1: Theoretical Questions}
+
+\paragraph{Q1.1.} Your answer.
+
+\paragraph{Q1.2.} Your answer.
+
+
+\section*{Part 2: Image Classification with MLPs and CNNs}
+
+\paragraph{Q2.1.}
+Your answer. Report results as mean $\pm$ standard deviation over 3 seeds, as in Table~\ref{tab:example}, and cite the papers you use, e.g., \citet{vinyals2015show}.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{lrcc}
+\toprule
+Model & Parameters & Validation accuracy (\%) & Test accuracy (\%) \\
+\midrule
+Logistic regression & 0 & $0.0 \pm 0.0$ & $0.0 \pm 0.0$ \\
+MLP & 0 & $0.0 \pm 0.0$ & $0.0 \pm 0.0$ \\
+\bottomrule
+\end{tabular}
+\caption{An example table (mean $\pm$ std over 3 seeds).}
+\label{tab:example}
+\end{table}
+
+% An example figure:
+% \begin{figure}[ht]
+% \centering
+% \includegraphics[width=0.8\linewidth]{figures/curves.pdf}
+% \caption{Training loss and validation accuracy per epoch (3 seeds).}
+% \label{fig:curves}
+% \end{figure}
+
+\paragraph{Q2.2.} Your answer.
+
+\paragraph{Q2.3.} Your answer.
+
+\paragraph{Q2.4.} Your answer.
+
+\paragraph{Q2.5.} Your answer.
+
+
+\section*{Part 3: Image Captioning with an RNN Decoder}
+
+\paragraph{Q3.1.} Your answer.
+
+\paragraph{Q3.2.} Your answer.
+
+\paragraph{Q3.3.} Your answer.
+
+\paragraph{Q3.4.} Your answer.
+
+
+\section*{Part 4 (Bonus): Transformers and Pretrained Models}
+% Remove this section if you do not attempt Part 4 (the page limit is then 8 pages).
+
+\paragraph{Q4.1.} Your answer.
+
+\paragraph{Q4.2.} Your answer.
+
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\clearpage
+\newpage
+\appendix
+
+
+\section*{Appendix: Collaboration and AI Use Declaration Checklist}
+
+\begin{enumerate}
+\item \textbf{Did you use AI tools (e.g., ChatGPT, Claude, Copilot)?}\\
+$\square$ No\\
+$\square$ Yes (specify which ones, and proceed below)
+
+\item \textbf{Which tool(s) did you use?}
+
+\item \textbf{How did you use AI? (check all that apply)}\\
+$\square$ Brainstorming ideas\\
+$\square$ Explaining concepts we did not understand\\
+$\square$ Helping with math derivations\\
+$\square$ Assisting with code\\
+$\square$ Debugging\\
+$\square$ Designing or analyzing experiments\\
+$\square$ Editing or improving our writing\\
+$\square$ Generating answers or content\\
+$\square$ Other: \rule{5cm}{0.4pt}
+
+\item \textbf{Which parts of the project were influenced by AI?} \emph{(Be specific: indicate question numbers and explain.)}
+
+\item \textbf{How did you verify or modify the AI-generated content?}\\
+$\square$ We checked facts with other sources\\
+$\square$ We rewrote it in our own words\\
+$\square$ We tested or validated the outputs (e.g., code, math)\\
+$\square$ We made no changes\\
+$\square$ Other: \rule{5cm}{0.4pt}
+
+\item \textbf{What did you learn from using (or not using) AI?}
+
+\item \textbf{Did you collaborate with students outside your group?} If so, indicate whom, on which questions, and how.
+
+\item \textbf{Does this submission reflect the understanding of every group member?}\\
+$\square$ Yes \qquad $\square$ Partially \qquad $\square$ Not really (please explain): \rule{4cm}{0.4pt}
+\end{enumerate}
+
+\end{document}
