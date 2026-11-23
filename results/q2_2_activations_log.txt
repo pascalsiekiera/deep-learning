@@ -1,0 +1,22 @@
+[relu  seed 0] val 37.20 | train 62.31 | best epoch 12 | 13.64M params | test 30.90
+[relu  seed 1] val 36.20 | train 45.57 | best epoch  6 | 13.64M params | test 29.10
+[relu  seed 2] val 36.10 | train 52.58 | best epoch  8 | 13.64M params | test 29.00
+[gelu  seed 0] val 34.20 | train 60.45 | best epoch 10 | 13.64M params | test 28.10
+[gelu  seed 1] val 33.60 | train 42.05 | best epoch  4 | 13.64M params | test 28.40
+[gelu  seed 2] val 34.60 | train 43.75 | best epoch  4 | 13.64M params | test 29.20
+[tanh  seed 0] val 33.50 | train 60.69 | best epoch 10 | 13.64M params | test 26.50
+[tanh  seed 1] val 33.60 | train 51.12 | best epoch  7 | 13.64M params | test 27.00
+[tanh  seed 2] val 33.40 | train 73.12 | best epoch 14 | 13.64M params | test 27.80
+[elu   seed 0] val 33.70 | train 55.62 | best epoch 10 | 13.64M params | test 27.60
+[elu   seed 1] val 33.20 | train 58.25 | best epoch 10 | 13.64M params | test 29.20
+[elu   seed 2] val 35.00 | train 46.97 | best epoch  7 | 13.64M params | test 29.40
+[prelu seed 0] val 35.80 | train 63.20 | best epoch 10 | 13.64M params | test 29.00
+[prelu seed 1] val 36.90 | train 68.71 | best epoch 13 | 13.64M params | test 29.60
+[prelu seed 2] val 35.00 | train 40.97 | best epoch  4 | 13.64M params | test 28.80
+
+activation  params       train            val              test          best epochs
+relu        13,643,786  53.49 ± 8.41  36.50 ± 0.61  29.67 ± 1.07  [12, 6, 8]
+prelu       13,643,788  57.63 ± 14.69  35.90 ± 0.95  29.13 ± 0.42  [10, 13, 4]
+gelu        13,643,786  48.75 ± 10.17  34.13 ± 0.50  28.57 ± 0.57  [10, 4, 4]
+elu         13,643,786  53.61 ± 5.90  33.97 ± 0.93  28.73 ± 0.99  [10, 10, 7]
+tanh        13,643,786  61.65 ± 11.03  33.50 ± 0.10  27.10 ± 0.66  [10, 7, 14]

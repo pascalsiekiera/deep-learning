@@ -1,0 +1,64 @@
+{
+ "examples_per_split": {
+  "train": 6500,
+  "validation": 1000,
+  "test": 1000
+ },
+ "class_counts": {
+  "train": {
+   "airplane": 650,
+   "bus": 650,
+   "cat": 650,
+   "dog": 650,
+   "elephant": 650,
+   "giraffe": 650,
+   "horse": 650,
+   "motorcycle": 650,
+   "train": 650,
+   "truck": 650
+  },
+  "validation": {
+   "airplane": 100,
+   "bus": 100,
+   "cat": 100,
+   "dog": 100,
+   "elephant": 100,
+   "giraffe": 100,
+   "horse": 100,
+   "motorcycle": 100,
+   "train": 100,
+   "truck": 100
+  },
+  "test": {
+   "airplane": 100,
+   "bus": 100,
+   "cat": 100,
+   "dog": 100,
+   "elephant": 100,
+   "giraffe": 100,
+   "horse": 100,
+   "motorcycle": 100,
+   "train": 100,
+   "truck": 100
+  }
+ },
+ "normalization": {
+  "computed_on": "train",
+  "pixel_scale": "uint8 / 255, i.e. values in [0, 1]",
+  "channels": [
+   "R",
+   "G",
+   "B"
+  ],
+  "mean": [
+   0.46338337659835815,
+   0.45295026898384094,
+   0.4172884225845337
+  ],
+  "std": [
+   0.258460134267807,
+   0.2571023106575012,
+   0.27130165696144104
+  ]
+ }
+}
