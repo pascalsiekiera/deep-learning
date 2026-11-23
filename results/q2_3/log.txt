@@ -135,5 +135,5 @@ tensor([[174,  15,  11,  11,   5,  27,  10,  14,  12,  21],
         [ 10,  22,  43,  20,  22,  19,   6, 113,  12,  33],
         [ 32,  54,  24,  12,  22,  30,  10,  34,  52,  30],
         [ 25,  52,  25,   6,  23,  23,  12,  40,  34,  60]])
-saved /Users/psi/code/uni/deep-learning/figures/q2_3_curves.pdf
-saved /Users/psi/code/uni/deep-learning/figures/q2_3_confusion.pdf
+saved /Users/psi/code/uni/deep-learning/figures/q2_3/curves.pdf
+saved /Users/psi/code/uni/deep-learning/figures/q2_3/confusion.pdf

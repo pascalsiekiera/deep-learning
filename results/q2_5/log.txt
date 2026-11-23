@@ -1,0 +1,142 @@
+== 1. random search: 16 trials, seed 0 ==
+[search  1/16] val 60.70 | train 64.12 | best epoch 12 |  0.39M params | channels=[32, 64, 128, 256] x1 dropout=0.5 | adam lr=0.00041 wd=0.0001 bs=128 sched=cosine
+[search  2/16] val 76.50 | train 100.00 | best epoch 31 |  1.18M params | channels=[32, 64, 128, 256] x2 dropout=0.0 | sgd lr=0.01 wd=0.0005 bs=64 sched=cosine
+[search  3/16] val 58.50 | train 59.86 | best epoch  8 |  1.56M params | channels=[64, 128, 256, 512] x1 dropout=0.0 | adam lr=0.0019 wd=0.0005 bs=128 sched=none
+[search  4/16] val 57.40 | train 56.51 | best epoch  6 |  1.56M params | channels=[64, 128, 256, 512] x1 dropout=0.5 | sgd lr=0.013 wd=0.0005 bs=128 sched=cosine
+[search  5/16] val 71.80 | train 100.00 | best epoch 46 |  0.39M params | channels=[32, 64, 128, 256] x1 dropout=0.3 | sgd lr=0.079 wd=0.0005 bs=64 sched=cosine
+[search  6/16] val 67.10 | train 75.38 | best epoch 17 |  1.18M params | channels=[32, 64, 128, 256] x2 dropout=0.5 | sgd lr=0.038 wd=0.0001 bs=64 sched=cosine
+[search  7/16] val 65.00 | train 89.05 | best epoch 15 |  1.18M params | channels=[32, 64, 128, 256] x2 dropout=0.3 | adam lr=0.00052 wd=0.0001 bs=128 sched=none
+[search  8/16] val 64.40 | train 73.32 | best epoch 19 |  1.18M params | channels=[32, 64, 128, 256] x2 dropout=0.5 | sgd lr=0.035 wd=0.0001 bs=128 sched=none
+[search  9/16] val 62.90 | train 66.18 | best epoch 12 |  1.18M params | channels=[32, 64, 128, 256] x2 dropout=0.5 | sgd lr=0.007 wd=0.0001 bs=64 sched=cosine
+[search 10/16] val 65.80 | train 81.12 | best epoch 18 |  1.18M params | channels=[32, 64, 128, 256] x2 dropout=0.5 | adam lr=0.00099 wd=0.0001 bs=64 sched=none
+[search 11/16] val 72.10 | train 99.94 | best epoch 28 |  1.56M params | channels=[64, 128, 256, 512] x1 dropout=0.0 | sgd lr=0.074 wd=0 bs=128 sched=cosine
+[search 12/16] val 73.50 | train 100.00 | best epoch 47 |  1.18M params | channels=[32, 64, 128, 256] x2 dropout=0.5 | adam lr=0.00032 wd=0.0005 bs=64 sched=cosine
+[search 13/16] val 67.20 | train 82.42 | best epoch 19 |  1.56M params | channels=[64, 128, 256, 512] x1 dropout=0.3 | sgd lr=0.0078 wd=0.0001 bs=64 sched=cosine
+[search 14/16] val 73.40 | train 100.00 | best epoch 30 |  1.18M params | channels=[32, 64, 128, 256] x2 dropout=0.3 | sgd lr=0.0031 wd=0.0005 bs=64 sched=cosine
+[search 15/16] val 63.20 | train 66.88 | best epoch 14 |  1.18M params | channels=[32, 64, 128, 256] x2 dropout=0.5 | sgd lr=0.056 wd=0.0001 bs=128 sched=none
+[search 16/16] val 60.60 | train 64.72 | best epoch 10 |  0.39M params | channels=[32, 64, 128, 256] x1 dropout=0.5 | adam lr=0.00089 wd=0.0005 bs=128 sched=none
+
+== 2. re-evaluate the top 3 with seeds [0, 1, 2] ==
+[top 1] val 68.73 ± 7.12 | train 80.19 ± 17.65 | channels=[32, 64, 128, 256] x2 dropout=0.0 | sgd lr=0.01 wd=0.0005 bs=64 sched=cosine
+[top 2] val 69.77 ± 6.21 | train 87.75 ± 21.22 | channels=[32, 64, 128, 256] x2 dropout=0.5 | adam lr=0.00032 wd=0.0005 bs=64 sched=cosine
+[top 3] val 71.03 ± 3.67 | train 93.53 ± 11.20 | channels=[32, 64, 128, 256] x2 dropout=0.3 | sgd lr=0.0031 wd=0.0005 bs=64 sched=cosine
+selected: channels=[32, 64, 128, 256] x2 dropout=0.3 | sgd lr=0.0031 wd=0.0005 bs=64 sched=cosine (val 71.03 ± 3.67)
+
+== 3. final runs of the selected CNN ==
+  seed 0: val 73.40 | train 100.00 | best epoch 30 |  1.18M params | test 69.40
+  seed 1: val 66.80 | train 80.60 | best epoch 14 |  1.18M params | test 64.40
+  seed 2: val 72.90 | train 100.00 | best epoch 33 |  1.18M params | test 69.30
+saved /Users/psi/code/uni/deep-learning/figures/q2_5/curves.pdf
+
+model            params       train            val              test
+linear (Q2.1)      122,890  42.14 ± 3.49  32.20 ± 0.50  26.83 ± 0.83
+MLP (Q2.2)      13,643,786  53.49 ± 8.41  36.50 ± 0.61  29.67 ± 1.07
+CNN (Q2.5)       1,175,786  93.53 ± 11.20  71.03 ± 3.67  67.70 ± 2.86
+
+== 4a. shifted test images ==
+CNN     right       0px 67.70±2.86 |  1px 67.63±2.95 |  2px 67.00±3.47 |  3px 66.17±3.65 |  4px 65.17±4.43 |  6px 65.03±4.89 |  8px 63.07±4.47 | 12px 59.03±5.93 | 16px 56.03±6.43
+CNN     right_mask  0px 67.70±2.86 |  1px 67.53±2.71 |  2px 66.97±3.74 |  3px 66.47±3.88 |  4px 66.17±3.95 |  6px 65.30±3.75 |  8px 63.73±4.83 | 12px 61.30±6.67 | 16px 58.10±7.94
+CNN     right_lost  0px 67.70±2.86 |  1px 67.53±2.72 |  2px 67.20±2.69 |  3px 67.27±2.86 |  4px 67.50±2.72 |  6px 67.30±3.00 |  8px 66.53±1.70 | 12px 65.33±2.73 | 16px 63.00±1.80
+CNN     down        0px 67.70±2.86 |  1px 67.43±3.16 |  2px 66.17±3.43 |  3px 66.63±4.04 |  4px 66.30±4.23 |  6px 65.10±3.21 |  8px 63.50±2.10 | 12px 60.57±2.41 | 16px 55.13±2.67
+CNN     down_mask   0px 67.70±2.86 |  1px 67.33±3.16 |  2px 67.20±3.35 |  3px 66.60±3.87 |  4px 66.50±3.33 |  6px 65.57±2.83 |  8px 65.60±2.62 | 12px 65.00±2.86 | 16px 63.93±2.12
+CNN     down_lost   0px 67.70±2.86 |  1px 67.20±3.12 |  2px 66.87±3.33 |  3px 66.57±3.27 |  4px 66.30±3.51 |  6px 64.37±3.14 |  8px 64.07±2.57 | 12px 63.10±2.04 | 16px 59.07±3.00
+MLP     right       0px 29.67±1.07 |  1px 29.10±1.25 |  2px 29.10±0.82 |  3px 28.73±0.59 |  4px 29.07±1.27 |  6px 28.60±1.15 |  8px 28.03±0.90 | 12px 26.10±1.01 | 16px 24.10±0.85
+MLP     right_mask  0px 29.67±1.07 |  1px 29.97±0.72 |  2px 29.67±1.08 |  3px 29.33±0.92 |  4px 29.03±0.46 |  6px 28.73±0.21 |  8px 28.97±0.21 | 12px 29.60±0.26 | 16px 28.97±0.32
+MLP     right_lost  0px 29.67±1.07 |  1px 29.63±1.18 |  2px 29.67±0.74 |  3px 29.43±1.15 |  4px 29.47±0.87 |  6px 29.93±0.35 |  8px 29.93±0.75 | 12px 29.37±0.49 | 16px 29.40±0.44
+MLP     down        0px 29.67±1.07 |  1px 29.67±1.36 |  2px 29.20±0.75 |  3px 28.47±0.80 |  4px 28.20±1.31 |  6px 26.00±1.68 |  8px 23.93±1.12 | 12px 21.20±0.17 | 16px 19.30±1.01
+MLP     down_mask   0px 29.67±1.07 |  1px 29.43±1.70 |  2px 29.13±1.46 |  3px 29.20±1.15 |  4px 28.67±1.01 |  6px 28.53±0.60 |  8px 28.80±0.79 | 12px 28.37±1.33 | 16px 27.60±1.87
+MLP     down_lost   0px 29.67±1.07 |  1px 29.90±0.82 |  2px 29.97±0.55 |  3px 29.83±0.55 |  4px 29.87±0.65 |  6px 28.80±0.26 |  8px 28.10±0.53 | 12px 27.90±0.30 | 16px 26.83±0.59
+linear  right       0px 26.83±0.83 |  1px 26.47±0.91 |  2px 26.47±1.06 |  3px 25.13±1.19 |  4px 25.20±0.53 |  6px 25.13±1.55 |  8px 24.20±1.51 | 12px 23.67±0.31 | 16px 21.43±0.61
+linear  right_mask  0px 26.83±0.83 |  1px 26.87±1.04 |  2px 26.47±1.54 |  3px 25.50±1.91 |  4px 25.00±1.56 |  6px 25.80±1.15 |  8px 25.07±0.67 | 12px 25.87±0.90 | 16px 25.23±0.75
+linear  right_lost  0px 26.83±0.83 |  1px 25.97±0.67 |  2px 26.30±1.01 |  3px 26.27±0.64 |  4px 26.30±1.05 |  6px 26.97±1.18 |  8px 27.33±0.74 | 12px 26.27±0.87 | 16px 25.97±1.25
+linear  down        0px 26.83±0.83 |  1px 27.17±0.67 |  2px 27.43±0.71 |  3px 25.73±0.15 |  4px 24.80±0.95 |  6px 23.70±0.52 |  8px 22.17±0.06 | 12px 19.60±1.44 | 16px 18.43±0.31
+linear  down_mask   0px 26.83±0.83 |  1px 26.83±0.85 |  2px 27.30±0.44 |  3px 26.17±1.42 |  4px 25.50±1.45 |  6px 25.10±1.68 |  8px 25.43±0.47 | 12px 25.00±0.87 | 16px 24.13±0.06
+linear  down_lost   0px 26.83±0.83 |  1px 26.50±0.56 |  2px 26.90±0.40 |  3px 26.40±0.82 |  4px 26.03±0.59 |  6px 25.80±0.44 |  8px 25.53±1.02 | 12px 25.67±0.60 | 16px 25.43±0.91
+saved /Users/psi/code/uni/deep-learning/figures/q2_5/shifts.pdf
+
+== 4b. fixed pixel permutation, CNN retrained from scratch ==
+[q2_5/cnn_perm seed 0] val 28.10 | test 27.40 | best epoch 9
+[q2_5/cnn_perm seed 1] val 30.60 | test 28.50 | best epoch 10
+[q2_5/cnn_perm seed 2] val 29.70 | test 29.80 | best epoch 10
+CNN original  train 93.53 ± 11.20 | val 71.03 ± 3.67 | test 67.70 ± 2.86 | best epochs [30, 14, 33]
+CNN permuted  train 31.87 ± 1.77 | val 29.47 ± 1.27 | test 28.57 ± 1.20 | best epochs [9, 10, 10]
+MLP original  train 53.49 ± 8.41 | val 36.50 ± 0.61 | test 29.67 ± 1.07 | best epochs [12, 6, 8]
+MLP permuted  train 51.62 ± 11.64 | val 35.60 ± 0.80 | test 30.20 ± 1.15 | best epochs [12, 8, 4]
+
+== 5. selected CNN with a fixed budget: 50 epochs, no early stopping ==
+  seed 0: val 73.70 | train 100.00 | best epoch 41 |  1.18M params | test 70.20
+  seed 1: val 74.30 | train 100.00 | best epoch 40 |  1.18M params | test 71.30
+  seed 2: val 72.90 | train 100.00 | best epoch 33 |  1.18M params | test 69.30
+patience 8                train 93.53 ± 11.20 | val 71.03 ± 3.67 | test 67.70 ± 2.86 | best epochs [30, 14, 33]
+50 epochs, no early stop  train 100.00 ± 0.00 | val 73.63 ± 0.70 | test 70.27 ± 1.00 | best epochs [41, 40, 33]
+saved /Users/psi/code/uni/deep-learning/figures/q2_5/curves_50ep.pdf
+
+== confusion matrices of the best CNN (test, 3 seeds) ==
+per-class test accuracy of q2_5/cnn_best (mean ± std over seeds):
+  airplane     75.0 ±  7.9
+  bus          73.0 ±  3.6
+  cat          68.7 ± 14.0
+  dog          56.3 ± 19.6
+  elephant     67.3 ±  5.5
+  giraffe      78.3 ±  4.0
+  horse        47.0 ±  9.8
+  motorcycle   84.3 ±  7.5
+  train        73.3 ±  2.9
+  truck        53.7 ±  4.2
+most frequent confusions (true -> predicted, count out of 300):
+  dog         -> cat         88
+  cat         -> dog         75
+  truck       -> bus         51
+  horse       -> dog         50
+  bus         -> truck       41
+  elephant    -> dog         37
+  train       -> truck       27
+  truck       -> train       25
+  horse       -> motorcycle  24
+  horse       -> elephant    20
+confusion matrix (rows = true, summed over seeds):
+tensor([[225,   8,   5,  10,   0,   0,   5,   9,  20,  18],
+        [  3, 219,   5,   5,   0,   0,   2,   5,  20,  41],
+        [  0,   1, 206,  75,   6,   6,   0,   0,   5,   1],
+        [  3,   0,  88, 169,   3,   8,  17,   4,   6,   2],
+        [  1,   2,  15,  37, 202,  12,  20,   4,   2,   5],
+        [  0,   1,   9,  19,  12, 235,   9,   7,   8,   0],
+        [  5,  10,  17,  50,  20,  16, 141,  24,   6,  11],
+        [  4,   9,   1,  11,   0,   2,   6, 253,   2,  12],
+        [  7,  15,   4,   5,   5,   3,   3,  11, 220,  27],
+        [ 15,  51,  14,  13,   6,   2,   3,  10,  25, 161]])
+saved /Users/psi/code/uni/deep-learning/figures/q2_5/confusion_cnn.pdf
+per-class test accuracy of q2_5/cnn_best_50ep (mean ± std over seeds):
+  airplane     81.0 ±  3.0
+  bus          74.7 ±  0.6
+  cat          76.7 ±  3.1
+  dog          48.3 ±  7.4
+  elephant     74.7 ±  4.0
+  giraffe      82.7 ±  2.1
+  horse        51.3 ±  2.3
+  motorcycle   86.7 ±  2.3
+  train        71.7 ±  3.5
+  truck        55.0 ±  1.7
+most frequent confusions (true -> predicted, count out of 300):
+  dog         -> cat         101
+  truck       -> bus         48
+  cat         -> dog         48
+  bus         -> truck       37
+  train       -> truck       30
+  horse       -> elephant    29
+  horse       -> dog         27
+  dog         -> horse       22
+  truck       -> train       20
+  truck       -> airplane    20
+confusion matrix (rows = true, summed over seeds):
+tensor([[243,   8,   6,   3,   1,   0,   5,  10,  10,  14],
+        [  6, 224,   6,   2,   0,   0,   5,   6,  14,  37],
+        [  1,   1, 230,  48,   9,   7,   2,   1,   0,   1],
+        [  5,   0, 101, 145,   7,  10,  22,   2,   5,   3],
+        [  3,   2,  20,  17, 224,   8,  17,   4,   2,   3],
+        [  0,   1,   9,   7,  13, 248,   9,   5,   8,   0],
+        [  6,  12,  20,  27,  29,  15, 154,  19,   5,  13],
+        [  3,   8,   2,   4,   0,   1,  11, 260,   2,   9],
+        [ 10,  17,   6,   2,   5,   1,   3,  11, 215,  30],
+        [ 20,  48,  16,   9,   9,   1,   4,   8,  20, 165]])
+saved /Users/psi/code/uni/deep-learning/figures/q2_5/confusion_cnn_50ep.pdf

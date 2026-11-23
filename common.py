@@ -8,6 +8,7 @@ A config is a plain dict; any key left out takes its value from DEFAULTS. Exampl
     print(results["test_acc"])        # {"mean": ..., "std": ..., "values": [...]}
 """
 
+import gc
 import json
 import os
 from functools import lru_cache
@@ -18,7 +19,7 @@ from torch.utils.data import DataLoader
 
 from data import ImageDataset, channel_stats
 from load_data import SPLITS, load_coco_dominant10
-from models import MLP
+from models import CNN, MLP
 from train import count_parameters, get_device, set_seed, train
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -45,6 +46,13 @@ DEFAULTS = {
     "normalize": True,        # per-channel standardization with training-set statistics
     "flip": False,            # random horizontal flips on the training set
     "permutation_seed": None, # if set, apply one fixed random pixel permutation to all splits
+}
+# Extra keys of the CNN (Q2.5). They are only added to configs with model="cnn", so the saved
+# configs of all MLP runs (and therefore their cached results) stay unchanged.
+CNN_DEFAULTS = {
+    "channels": (32, 64, 128, 256),
+    "convs_per_block": 1,
+    "batchnorm": True,
 }
 
 
@@ -96,6 +104,23 @@ def mask_border(images, dx=0, dy=0, fill=0.0):
     return out
 
 
+def mask_lost(images, dx=0, dy=0, fill=0.0):
+    """Second control for shift_images: blank the strip whose content shift_images(images, dx,
+    dy) pushes out of the frame (e.g. the bottom dy rows for a shift down), without moving the
+    image. For a perfectly translation-invariant model, shifting = losing exactly this content,
+    so its accuracy on shifted images should equal its accuracy here."""
+    out = images.clone()
+    if dx > 0:
+        out[..., :, -dx:] = fill
+    elif dx < 0:
+        out[..., :, :-dx] = fill
+    if dy > 0:
+        out[..., -dy:, :] = fill
+    elif dy < 0:
+        out[..., :-dy, :] = fill
+    return out
+
+
 def get_datasets(config):
     """{split: ImageDataset}, plus an un-augmented copy of the training set ("train_eval") used
     to measure training accuracy."""
@@ -115,7 +140,10 @@ def get_datasets(config):
 
 def get_loaders(config):
     """{split: DataLoader}; only "train" is shuffled (and augmented, if config["flip"])."""
-    return {split: DataLoader(ds, batch_size=config["batch_size"] if split == "train" else 500,
+    # Evaluation batch size: 500 for MLPs; 100 for CNNs, whose activation maps would otherwise
+    # need several GB of (GPU) memory. It does not change the predictions.
+    eval_batch_size = 100 if config["model"] == "cnn" else 500
+    return {split: DataLoader(ds, batch_size=config["batch_size"] if split == "train" else eval_batch_size,
                               shuffle=split == "train")
             for split, ds in get_datasets(config).items()}
 
@@ -150,15 +178,21 @@ def mean_std(values):
 
 # ----------------------------------------------------------------------------- building blocks
 def full_config(config):
-    unknown = set(config) - set(DEFAULTS)
+    unknown = set(config) - set(DEFAULTS) - set(CNN_DEFAULTS)
     if unknown:
         raise KeyError(f"unknown config keys: {sorted(unknown)}")
+    if config.get("model", DEFAULTS["model"]) == "cnn":
+        return {**DEFAULTS, **CNN_DEFAULTS, **config}
     return {**DEFAULTS, **config}
 
 
 def build_model(config):
     if config["model"] == "mlp":
         return MLP(hidden=tuple(config["hidden"]), activation=config["activation"],
+                   dropout=config["dropout"])
+    if config["model"] == "cnn":
+        return CNN(channels=tuple(config["channels"]), convs_per_block=config["convs_per_block"],
+                   batchnorm=config["batchnorm"], activation=config["activation"],
                    dropout=config["dropout"])
     raise ValueError(f"unknown model {config['model']!r}")
 
@@ -187,22 +221,45 @@ def classification_loss(model, batch):
 
 
 # ----------------------------------------------------------------------------- experiments
+def release_device_memory():
+    """Free the memory cached by PyTorch's GPU allocator. Without this, the MPS cache of earlier
+    runs in the same process kept growing (3.4 GB after 9 CNN runs) and pushed an 8 GB machine
+    into swapping."""
+    gc.collect()
+    if torch.backends.mps.is_available():
+        torch.mps.empty_cache()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+
+
+def run_device(config):
+    """CUDA if available (train.get_device); otherwise the Apple GPU (MPS) for CNNs, which is
+    about 4x faster than the CPU there and gave bit-identical results on repeated runs. MLPs stay
+    on the CPU, where all their results were produced."""
+    device = get_device()
+    if device.type == "cpu" and config["model"] == "cnn" and torch.backends.mps.is_available():
+        return torch.device("mps")
+    return device
+
+
 def run(name, config, seed, save_model=False, verbose=False):
     """Train one configuration with one seed. Saves results/<name>/seed<seed>.json and, if
     save_model, checkpoints/<name>/seed<seed>.pt. Returns (result dict, trained model)."""
     config = full_config(config)
+    release_device_memory()
     set_seed(seed)
     loaders = get_loaders(config)
     model = build_model(config)
     optimizer = build_optimizer(config, model)
+    device = run_device(config)
     history = train(model, optimizer, classification_loss, loaders["train"],
                     val_score_fn=lambda m: accuracy_on(m, loaders["validation"]),
                     epochs=config["epochs"], scheduler=build_scheduler(config, optimizer),
-                    patience=config["patience"], device=get_device(), verbose=verbose)
+                    patience=config["patience"], device=device, verbose=verbose)
     # `train` has restored the epoch with the best validation accuracy.
     result = {
         "name": name, "seed": seed, "config": config,
-        "num_parameters": count_parameters(model),
+        "num_parameters": count_parameters(model), "device": str(device),
         "history": history,
         "train_acc": accuracy_on(model, loaders["train_eval"]),
         "val_acc": accuracy_on(model, loaders["validation"]),
@@ -263,7 +320,7 @@ def plot_learning_curves(runs, path, title=None):
     the runs can have different lengths); a dot marks the restored best epoch."""
     import matplotlib.pyplot as plt   # only needed for plots
 
-    fig, axes = plt.subplots(1, 2, figsize=(9, 3.2))
+    fig, axes = plt.subplots(1, 2, figsize=(9, 3.4), layout="constrained")
     for r in runs:
         h = r["history"]
         epochs = list(range(1, len(h["train_loss"]) + 1))
@@ -279,8 +336,70 @@ def plot_learning_curves(runs, path, title=None):
         ax.grid(alpha=0.3)
     axes[0].legend()
     if title:
-        fig.suptitle(title)
-    fig.tight_layout()
+        fig.suptitle(title, fontsize=8)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    fig.savefig(path)
+    plt.close(fig)
+    print("saved", path)
+
+
+# ----------------------------------------------------------------------------- confusion matrix
+def class_confusion(name, seeds=SEEDS, verbose=True):
+    """Per-class test accuracy (mean ± std over seeds) and the confusion matrix summed over the
+    seeds (rows = true class) of the saved models of experiment `name`."""
+    from load_data import CLASSES
+    from metrics import confusion_matrix, per_class_accuracy
+
+    config = full_config(load_results(name)[0]["config"])
+    test = get_loaders(config)["test"]
+    device = run_device(config)
+    matrix = torch.zeros(len(CLASSES), len(CLASSES), dtype=torch.long)
+    per_class = []
+    for seed in seeds:
+        preds, labels = predict(load_model(name, seed).to(device), test)
+        matrix += confusion_matrix(preds, labels)
+        per_class.append(per_class_accuracy(preds, labels))
+    per_class = torch.stack(per_class)   # (seeds, classes)
+    off = matrix.clone()
+    off.fill_diagonal_(0)
+    pairs = sorted(((off[i, j].item(), CLASSES[i], CLASSES[j]) for i in range(len(CLASSES))
+                    for j in range(len(CLASSES)) if i != j), reverse=True)[:10]
+    if verbose:
+        print(f"per-class test accuracy of {name} (mean ± std over seeds):")
+        for c, cls in enumerate(CLASSES):
+            print(f"  {cls:11s} {100 * per_class[:, c].mean():5.1f} ± {100 * per_class[:, c].std():4.1f}")
+        print(f"most frequent confusions (true -> predicted, count out of {100 * len(seeds)}):")
+        for count, t, p in pairs:
+            print(f"  {t:11s} -> {p:11s} {count}")
+        print("confusion matrix (rows = true, summed over seeds):")
+        print(matrix)
+    return {"matrix": matrix, "per_class": per_class,
+            "summary": {"per_class_test_acc": {c: mean_std(per_class[:, i].tolist())
+                                               for i, c in enumerate(CLASSES)},
+                        "confusion_matrix": matrix.tolist(),
+                        "predicted_counts": dict(zip(CLASSES, matrix.sum(0).tolist())),
+                        "top_confusions": [{"true": t, "pred": p, "count": n} for n, t, p in pairs]}}
+
+
+def plot_confusion(matrix, path, title=None, seeds=len(SEEDS)):
+    """Row-normalized confusion matrix (% of each true class), annotated."""
+    import matplotlib.pyplot as plt
+    from load_data import CLASSES
+
+    rates = matrix.float() / matrix.sum(1, keepdim=True)
+    fig, ax = plt.subplots(figsize=(6, 5.4), layout="constrained")
+    im = ax.imshow(100 * rates, cmap="Blues", vmin=0, vmax=100)
+    for i in range(len(CLASSES)):
+        for j in range(len(CLASSES)):
+            ax.text(j, i, f"{100 * rates[i, j]:.0f}", ha="center", va="center", fontsize=7,
+                    color="white" if rates[i, j] > 0.5 else "black")
+    ax.set_xticks(range(len(CLASSES)), CLASSES, rotation=45, ha="right")
+    ax.set_yticks(range(len(CLASSES)), CLASSES)
+    ax.set_xlabel("predicted class")
+    ax.set_ylabel("true class")
+    if title:
+        ax.set_title(title, fontsize=9)
+    fig.colorbar(im, ax=ax, label=f"% of the true class (test, {seeds} seeds)")
     os.makedirs(os.path.dirname(path), exist_ok=True)
     fig.savefig(path)
     plt.close(fig)

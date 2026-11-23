@@ -1561,6 +1561,18 @@
    60
   ]
  ],
+ "predicted_counts": {
+  "airplane": 333,
+  "bus": 346,
+  "cat": 409,
+  "dog": 251,
+  "elephant": 294,
+  "giraffe": 495,
+  "horse": 120,
+  "motorcycle": 374,
+  "train": 176,
+  "truck": 202
+ },
  "top_confusions": [
   {
    "true": "dog",

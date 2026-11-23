@@ -56,4 +56,4 @@ selected: hidden=[1024, 1024] relu dropout=0.5 | sgd lr=0.013 wd=0.0001 bs=128 s
 model             params     train            val              test
 linear (Q2.1)      122,890  42.14 ± 3.49  32.20 ± 0.50  26.83 ± 0.83
 mlp_best         13,643,786  53.49 ± 8.41  36.50 ± 0.61  29.67 ± 1.07
-saved /Users/psi/code/uni/deep-learning/figures/q2_2_curves.pdf
+saved /Users/psi/code/uni/deep-learning/figures/q2_2/curves.pdf
