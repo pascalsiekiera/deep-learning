@@ -1,0 +1,12 @@
+examples per split: {'train': 6500, 'validation': 1000, 'test': 1000}
+class counts (train): {'airplane': 650, 'bus': 650, 'cat': 650, 'dog': 650, 'elephant': 650, 'giraffe': 650, 'horse': 650, 'motorcycle': 650, 'train': 650, 'truck': 650}
+class counts (validation): {'airplane': 100, 'bus': 100, 'cat': 100, 'dog': 100, 'elephant': 100, 'giraffe': 100, 'horse': 100, 'motorcycle': 100, 'train': 100, 'truck': 100}
+class counts (test): {'airplane': 100, 'bus': 100, 'cat': 100, 'dog': 100, 'elephant': 100, 'giraffe': 100, 'horse': 100, 'motorcycle': 100, 'train': 100, 'truck': 100}
+training-set channel mean (R, G, B): [0.4634, 0.453, 0.4173]
+training-set channel std  (R, G, B): [0.2585, 0.2571, 0.2713]
+saved /Users/psi/code/uni/deep-learning/results/q2_1/data_stats.json
+q2_1/linear seed 0: train 0.4449 | val 0.3170 | test 0.2710 | best epoch 30
+q2_1/linear seed 1: train 0.3812 | val 0.3270 | test 0.2750 | best epoch 14
+q2_1/linear seed 2: train 0.4380 | val 0.3220 | test 0.2590 | best epoch 28
+linear baseline | parameters 122890 | train 42.14 ± 3.49 | val 32.20 ± 0.50 | test 26.83 ± 0.83
+saved /Users/psi/code/uni/deep-learning/figures/q2_1_curves.pdf

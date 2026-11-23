@@ -1,7 +1,7 @@
 """Q2.3: a one-factor-at-a-time study around the selected MLP of Q2.2.
 
 Protocol
-  * Base = the configuration selected in Q2.2 (results/q2_2_summary.json).
+  * Base = the configuration selected in Q2.2 (results/q2_2/summary.json).
   * Each factor is changed alone, everything else stays fixed.
   * Same budget for every run: 50 epochs, no early stopping (patience=None). As everywhere,
     the epoch with the best validation accuracy is restored at the end, so "val" below is the
@@ -14,7 +14,7 @@ Protocol
 
     python -m tasks.q2_3      # about 1.5 hours on a laptop CPU; finished runs are cached
 
-Writes results/q23/<setting>/, checkpoints/q23/<best setting>/, results/q2_3_summary.json,
+Writes results/q2_3/<setting>/, checkpoints/q2_3/<best setting>/, results/q2_3/summary.json,
 figures/q2_3_curves.pdf and figures/q2_3_confusion.pdf.
 """
 
@@ -45,7 +45,7 @@ FACTORS = {
 
 
 def base_config():
-    with open(os.path.join(RESULTS_DIR, "q2_2_summary.json")) as f:
+    with open(os.path.join(RESULTS_DIR, "q2_2", "summary.json")) as f:
         config = json.load(f)["selected_config"]
     config["hidden"] = tuple(config["hidden"])
     return {**config, **BUDGET}
@@ -58,7 +58,7 @@ def value_name(key, value):
 
 
 def setting_name(base, key, value):
-    return "q23/base" if value == base[key] else f"q23/{key}_{value_name(key, value)}"
+    return "q2_3/base" if value == base[key] else f"q2_3/{key}_{value_name(key, value)}"
 
 
 def summarize(runs):
@@ -149,7 +149,7 @@ def main():
                 all_runs[name] = runs
                 settings[name] = {"config": full_config(config), **summarize(runs)}
 
-    b = settings["q23/base"]
+    b = settings["q2_3/base"]
     tables = {}
     for factor, (key, values) in FACTORS.items():
         print(f"\n### {factor}\n")
@@ -160,11 +160,11 @@ def main():
             name = setting_name(base, key, value)
             s = settings[name]
             d, se = diff_vs(s["val_acc"], b["val_acc"])
-            meaningful = name != "q23/base" and abs(d) > 2 * se
+            meaningful = name != "q2_3/base" and abs(d) > 2 * se
             rows.append({"value": value_name(key, value), "name": name, "delta_val": d,
                          "delta_se": se, "meaningful": meaningful})
-            delta = "–" if name == "q23/base" else f"{d:+.2f} ± {se:.2f}{' *' if meaningful else ''}"
-            print(f"| {value_name(key, value)}{' (base)' if name == 'q23/base' else ''} | "
+            delta = "–" if name == "q2_3/base" else f"{d:+.2f} ± {se:.2f}{' *' if meaningful else ''}"
+            print(f"| {value_name(key, value)}{' (base)' if name == 'q2_3/base' else ''} | "
                   f"{s['num_parameters']:,} | {pct(s['train_acc'])} | {pct(s['val_acc'])} | {delta} | "
                   f"{pct(s['final_val'])} | {', '.join(map(str, s['best_epochs']))} | "
                   f"{s['final_train_loss']['mean']:.3f} |")
@@ -200,7 +200,7 @@ def main():
     os.makedirs(os.path.join(ROOT, "figures"), exist_ok=True)
     plot_curves(all_runs, base, os.path.join(ROOT, "figures", "q2_3_curves.pdf"))
     plot_confusion(matrix, os.path.join(ROOT, "figures", "q2_3_confusion.pdf"))
-    with open(os.path.join(RESULTS_DIR, "q2_3_summary.json"), "w") as f:
+    with open(os.path.join(RESULTS_DIR, "q2_3", "summary.json"), "w") as f:
         json.dump({"base_config": base, "factors": {k: [k2, [value_name(k2, v) for v in vs]]
                                                     for k, (k2, vs) in FACTORS.items()},
                    "settings": settings, "tables": tables, "best": best,

@@ -1,0 +1,830 @@
+{
+ "search_space": {
+  "depth": [
+   1,
+   2,
+   3
+  ],
+  "width": [
+   256,
+   512,
+   1024
+  ],
+  "activation": [
+   "relu",
+   "gelu",
+   "tanh"
+  ],
+  "dropout": [
+   0.0,
+   0.2,
+   0.5
+  ],
+  "optimizer": [
+   "adam",
+   "sgd"
+  ],
+  "lr": {
+   "adam": [
+    "log",
+    0.0001,
+    0.003
+   ],
+   "sgd": [
+    "log",
+    0.003,
+    0.1
+   ]
+  },
+  "weight_decay": [
+   0.0,
+   0.0001,
+   0.001
+  ],
+  "batch_size": [
+   64,
+   128
+  ],
+  "scheduler": [
+   "none",
+   "cosine"
+  ]
+ },
+ "fixed": {
+  "epochs": 50,
+  "patience": 8,
+  "momentum": 0.9
+ },
+ "trials": 30,
+ "top": 3,
+ "selected_config": {
+  "model": "mlp",
+  "hidden": [
+   1024,
+   1024
+  ],
+  "activation": "relu",
+  "dropout": 0.5,
+  "optimizer": "sgd",
+  "lr": 0.013,
+  "momentum": 0.9,
+  "weight_decay": 0.0001,
+  "scheduler": "none",
+  "batch_size": 128,
+  "epochs": 50,
+  "patience": 8,
+  "normalize": true,
+  "flip": false,
+  "permutation_seed": null
+ },
+ "search_ranking": [
+  {
+   "name": "q2_2/search/trial010",
+   "val_acc": 0.37400001287460327,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     512,
+     512
+    ],
+    "activation": "gelu",
+    "dropout": 0.2,
+    "optimizer": "sgd",
+    "lr": 0.0056,
+    "momentum": 0.9,
+    "weight_decay": 0.0001,
+    "scheduler": "cosine",
+    "batch_size": 128,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial009",
+   "val_acc": 0.3720000088214874,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     1024,
+     1024
+    ],
+    "activation": "relu",
+    "dropout": 0.5,
+    "optimizer": "sgd",
+    "lr": 0.013,
+    "momentum": 0.9,
+    "weight_decay": 0.0001,
+    "scheduler": "none",
+    "batch_size": 128,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial004",
+   "val_acc": 0.3529999852180481,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     1024,
+     1024,
+     1024
+    ],
+    "activation": "gelu",
+    "dropout": 0.5,
+    "optimizer": "adam",
+    "lr": 0.00023,
+    "momentum": 0.0,
+    "weight_decay": 0.0001,
+    "scheduler": "cosine",
+    "batch_size": 128,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial021",
+   "val_acc": 0.3529999852180481,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     1024,
+     1024,
+     1024
+    ],
+    "activation": "relu",
+    "dropout": 0.0,
+    "optimizer": "adam",
+    "lr": 0.00017,
+    "momentum": 0.0,
+    "weight_decay": 0.0001,
+    "scheduler": "cosine",
+    "batch_size": 64,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial006",
+   "val_acc": 0.35199999809265137,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     1024,
+     1024,
+     1024
+    ],
+    "activation": "gelu",
+    "dropout": 0.5,
+    "optimizer": "sgd",
+    "lr": 0.007,
+    "momentum": 0.9,
+    "weight_decay": 0.0001,
+    "scheduler": "cosine",
+    "batch_size": 64,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial029",
+   "val_acc": 0.34700000286102295,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     512
+    ],
+    "activation": "gelu",
+    "dropout": 0.2,
+    "optimizer": "sgd",
+    "lr": 0.011,
+    "momentum": 0.9,
+    "weight_decay": 0.0001,
+    "scheduler": "cosine",
+    "batch_size": 128,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial027",
+   "val_acc": 0.34599998593330383,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     256,
+     256,
+     256
+    ],
+    "activation": "tanh",
+    "dropout": 0.5,
+    "optimizer": "sgd",
+    "lr": 0.018,
+    "momentum": 0.9,
+    "weight_decay": 0.0,
+    "scheduler": "cosine",
+    "batch_size": 128,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial007",
+   "val_acc": 0.34599998593330383,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     512,
+     512,
+     512
+    ],
+    "activation": "gelu",
+    "dropout": 0.2,
+    "optimizer": "adam",
+    "lr": 0.0016,
+    "momentum": 0.0,
+    "weight_decay": 0.0001,
+    "scheduler": "cosine",
+    "batch_size": 128,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial001",
+   "val_acc": 0.3440000116825104,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     1024,
+     1024,
+     1024
+    ],
+    "activation": "relu",
+    "dropout": 0.0,
+    "optimizer": "sgd",
+    "lr": 0.0084,
+    "momentum": 0.9,
+    "weight_decay": 0.001,
+    "scheduler": "none",
+    "batch_size": 64,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial003",
+   "val_acc": 0.33899998664855957,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     256
+    ],
+    "activation": "gelu",
+    "dropout": 0.0,
+    "optimizer": "sgd",
+    "lr": 0.0056,
+    "momentum": 0.9,
+    "weight_decay": 0.0,
+    "scheduler": "cosine",
+    "batch_size": 128,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial013",
+   "val_acc": 0.33899998664855957,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     512
+    ],
+    "activation": "relu",
+    "dropout": 0.2,
+    "optimizer": "adam",
+    "lr": 0.00024,
+    "momentum": 0.0,
+    "weight_decay": 0.0001,
+    "scheduler": "none",
+    "batch_size": 128,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial026",
+   "val_acc": 0.3370000123977661,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     256
+    ],
+    "activation": "gelu",
+    "dropout": 0.5,
+    "optimizer": "adam",
+    "lr": 0.0009,
+    "momentum": 0.0,
+    "weight_decay": 0.0001,
+    "scheduler": "none",
+    "batch_size": 128,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial011",
+   "val_acc": 0.3370000123977661,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     1024
+    ],
+    "activation": "gelu",
+    "dropout": 0.0,
+    "optimizer": "adam",
+    "lr": 0.00011,
+    "momentum": 0.0,
+    "weight_decay": 0.0,
+    "scheduler": "cosine",
+    "batch_size": 64,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial000",
+   "val_acc": 0.335999995470047,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     256,
+     256,
+     256
+    ],
+    "activation": "relu",
+    "dropout": 0.2,
+    "optimizer": "adam",
+    "lr": 0.00086,
+    "momentum": 0.0,
+    "weight_decay": 0.0001,
+    "scheduler": "cosine",
+    "batch_size": 128,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial018",
+   "val_acc": 0.3330000042915344,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     1024,
+     1024,
+     1024
+    ],
+    "activation": "relu",
+    "dropout": 0.0,
+    "optimizer": "sgd",
+    "lr": 0.034,
+    "momentum": 0.9,
+    "weight_decay": 0.0001,
+    "scheduler": "cosine",
+    "batch_size": 64,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial008",
+   "val_acc": 0.3269999921321869,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     512
+    ],
+    "activation": "tanh",
+    "dropout": 0.0,
+    "optimizer": "adam",
+    "lr": 0.00012,
+    "momentum": 0.0,
+    "weight_decay": 0.0001,
+    "scheduler": "none",
+    "batch_size": 64,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial023",
+   "val_acc": 0.3269999921321869,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     1024
+    ],
+    "activation": "tanh",
+    "dropout": 0.5,
+    "optimizer": "adam",
+    "lr": 0.00068,
+    "momentum": 0.0,
+    "weight_decay": 0.0,
+    "scheduler": "none",
+    "batch_size": 64,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial022",
+   "val_acc": 0.3269999921321869,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     1024,
+     1024
+    ],
+    "activation": "tanh",
+    "dropout": 0.0,
+    "optimizer": "adam",
+    "lr": 0.00017,
+    "momentum": 0.0,
+    "weight_decay": 0.0,
+    "scheduler": "cosine",
+    "batch_size": 128,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial016",
+   "val_acc": 0.32499998807907104,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     512
+    ],
+    "activation": "tanh",
+    "dropout": 0.2,
+    "optimizer": "sgd",
+    "lr": 0.0045,
+    "momentum": 0.9,
+    "weight_decay": 0.0,
+    "scheduler": "none",
+    "batch_size": 64,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial019",
+   "val_acc": 0.32499998807907104,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     1024
+    ],
+    "activation": "relu",
+    "dropout": 0.0,
+    "optimizer": "adam",
+    "lr": 0.00045,
+    "momentum": 0.0,
+    "weight_decay": 0.001,
+    "scheduler": "none",
+    "batch_size": 64,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial017",
+   "val_acc": 0.3140000104904175,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     1024,
+     1024
+    ],
+    "activation": "tanh",
+    "dropout": 0.5,
+    "optimizer": "sgd",
+    "lr": 0.012,
+    "momentum": 0.9,
+    "weight_decay": 0.001,
+    "scheduler": "none",
+    "batch_size": 64,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial014",
+   "val_acc": 0.3070000112056732,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     512,
+     512
+    ],
+    "activation": "gelu",
+    "dropout": 0.2,
+    "optimizer": "sgd",
+    "lr": 0.025,
+    "momentum": 0.9,
+    "weight_decay": 0.0001,
+    "scheduler": "none",
+    "batch_size": 64,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial024",
+   "val_acc": 0.30399999022483826,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     256
+    ],
+    "activation": "tanh",
+    "dropout": 0.0,
+    "optimizer": "adam",
+    "lr": 0.0029,
+    "momentum": 0.0,
+    "weight_decay": 0.001,
+    "scheduler": "cosine",
+    "batch_size": 128,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial005",
+   "val_acc": 0.2939999997615814,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     512,
+     512
+    ],
+    "activation": "tanh",
+    "dropout": 0.2,
+    "optimizer": "sgd",
+    "lr": 0.053,
+    "momentum": 0.9,
+    "weight_decay": 0.001,
+    "scheduler": "cosine",
+    "batch_size": 128,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial028",
+   "val_acc": 0.28999999165534973,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     256,
+     256
+    ],
+    "activation": "gelu",
+    "dropout": 0.2,
+    "optimizer": "sgd",
+    "lr": 0.038,
+    "momentum": 0.9,
+    "weight_decay": 0.001,
+    "scheduler": "cosine",
+    "batch_size": 64,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial002",
+   "val_acc": 0.28999999165534973,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     256,
+     256,
+     256
+    ],
+    "activation": "tanh",
+    "dropout": 0.5,
+    "optimizer": "adam",
+    "lr": 0.002,
+    "momentum": 0.0,
+    "weight_decay": 0.001,
+    "scheduler": "cosine",
+    "batch_size": 128,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial025",
+   "val_acc": 0.19699999690055847,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     1024
+    ],
+    "activation": "gelu",
+    "dropout": 0.2,
+    "optimizer": "sgd",
+    "lr": 0.018,
+    "momentum": 0.9,
+    "weight_decay": 0.0,
+    "scheduler": "none",
+    "batch_size": 64,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial020",
+   "val_acc": 0.19300000369548798,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     256
+    ],
+    "activation": "relu",
+    "dropout": 0.0,
+    "optimizer": "sgd",
+    "lr": 0.032,
+    "momentum": 0.9,
+    "weight_decay": 0.001,
+    "scheduler": "none",
+    "batch_size": 64,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial015",
+   "val_acc": 0.19099999964237213,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     1024,
+     1024,
+     1024
+    ],
+    "activation": "relu",
+    "dropout": 0.2,
+    "optimizer": "sgd",
+    "lr": 0.091,
+    "momentum": 0.9,
+    "weight_decay": 0.0001,
+    "scheduler": "none",
+    "batch_size": 64,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  },
+  {
+   "name": "q2_2/search/trial012",
+   "val_acc": 0.10000000149011612,
+   "config": {
+    "model": "mlp",
+    "hidden": [
+     1024,
+     1024,
+     1024
+    ],
+    "activation": "gelu",
+    "dropout": 0.5,
+    "optimizer": "sgd",
+    "lr": 0.085,
+    "momentum": 0.9,
+    "weight_decay": 0.0001,
+    "scheduler": "cosine",
+    "batch_size": 64,
+    "epochs": 50,
+    "patience": 8,
+    "normalize": true,
+    "flip": false,
+    "permutation_seed": null
+   }
+  }
+ ],
+ "final": {
+  "train_acc": {
+   "mean": 0.5348718067010244,
+   "std": 0.0840565110047147,
+   "values": [
+    0.6230769157409668,
+    0.455692321062088,
+    0.5258461833000183
+   ]
+  },
+  "val_acc": {
+   "mean": 0.3649999996026357,
+   "std": 0.006082769957901306,
+   "values": [
+    0.3720000088214874,
+    0.3619999885559082,
+    0.3610000014305115
+   ]
+  },
+  "test_acc": {
+   "mean": 0.2966666618982951,
+   "std": 0.010692668561067622,
+   "values": [
+    0.3089999854564667,
+    0.29100000858306885,
+    0.28999999165534973
+   ]
+  }
+ }
+}

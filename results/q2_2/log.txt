@@ -1,0 +1,59 @@
+== 1. random search: 30 trials, seed 0 ==
+[search   1/30] val 33.60 | train 64.25 | best epoch  9 |  3.28M params | hidden=[256, 256, 256] relu dropout=0.2 | adam lr=0.00086 wd=0.0001 bs=128 sched=cosine
+[search   2/30] val 34.40 | train 45.54 | best epoch  3 | 14.69M params | hidden=[1024, 1024, 1024] relu dropout=0.0 | sgd lr=0.0084 wd=0.001 bs=64 sched=none
+[search   3/30] val 29.00 | train 28.09 | best epoch  7 |  3.28M params | hidden=[256, 256, 256] tanh dropout=0.5 | adam lr=0.002 wd=0.001 bs=128 sched=cosine
+[search   4/30] val 33.90 | train 46.85 | best epoch  2 |  3.15M params | hidden=[256] gelu dropout=0.0 | sgd lr=0.0056 wd=0 bs=128 sched=cosine
+[search   5/30] val 35.30 | train 38.48 | best epoch  4 | 14.69M params | hidden=[1024, 1024, 1024] gelu dropout=0.5 | adam lr=0.00023 wd=0.0001 bs=128 sched=cosine
+[search   6/30] val 29.40 | train 44.29 | best epoch  5 |  6.56M params | hidden=[512, 512] tanh dropout=0.2 | sgd lr=0.053 wd=0.001 bs=128 sched=cosine
+[search   7/30] val 35.20 | train 57.52 | best epoch 10 | 14.69M params | hidden=[1024, 1024, 1024] gelu dropout=0.5 | sgd lr=0.007 wd=0.0001 bs=64 sched=cosine
+[search   8/30] val 34.60 | train 75.05 | best epoch 17 |  6.82M params | hidden=[512, 512, 512] gelu dropout=0.2 | adam lr=0.0016 wd=0.0001 bs=128 sched=cosine
+[search   9/30] val 32.70 | train 86.29 | best epoch  8 |  6.30M params | hidden=[512] tanh dropout=0.0 | adam lr=0.00012 wd=0.0001 bs=64 sched=none
+[search  10/30] val 37.20 | train 62.31 | best epoch 12 | 13.64M params | hidden=[1024, 1024] relu dropout=0.5 | sgd lr=0.013 wd=0.0001 bs=128 sched=none
+[search  11/30] val 37.40 | train 46.22 | best epoch  4 |  6.56M params | hidden=[512, 512] gelu dropout=0.2 | sgd lr=0.0056 wd=0.0001 bs=128 sched=cosine
+[search  12/30] val 33.70 | train 72.18 | best epoch  3 | 12.59M params | hidden=[1024] gelu dropout=0.0 | adam lr=0.00011 wd=0 bs=64 sched=cosine
+[search  13/30] val 10.00 | train 10.00 | best epoch  1 | 14.69M params | hidden=[1024, 1024, 1024] gelu dropout=0.5 | sgd lr=0.085 wd=0.0001 bs=64 sched=cosine
+[search  14/30] val 33.90 | train 75.25 | best epoch  5 |  6.30M params | hidden=[512] relu dropout=0.2 | adam lr=0.00024 wd=0.0001 bs=128 sched=none
+[search  15/30] val 30.70 | train 58.35 | best epoch 16 |  6.56M params | hidden=[512, 512] gelu dropout=0.2 | sgd lr=0.025 wd=0.0001 bs=64 sched=none
+[search  16/30] val 19.10 | train 17.51 | best epoch  1 | 14.69M params | hidden=[1024, 1024, 1024] relu dropout=0.2 | sgd lr=0.091 wd=0.0001 bs=64 sched=none
+[search  17/30] val 32.50 | train 43.11 | best epoch  2 |  6.30M params | hidden=[512] tanh dropout=0.2 | sgd lr=0.0045 wd=0 bs=64 sched=none
+[search  18/30] val 31.40 | train 45.15 | best epoch 12 | 13.64M params | hidden=[1024, 1024] tanh dropout=0.5 | sgd lr=0.012 wd=0.001 bs=64 sched=none
+[search  19/30] val 33.30 | train 50.42 | best epoch  5 | 14.69M params | hidden=[1024, 1024, 1024] relu dropout=0.0 | sgd lr=0.034 wd=0.0001 bs=64 sched=cosine
+[search  20/30] val 32.50 | train 84.92 | best epoch  7 | 12.59M params | hidden=[1024] relu dropout=0.0 | adam lr=0.00045 wd=0.001 bs=64 sched=none
+[search  21/30] val 19.30 | train 18.54 | best epoch 12 |  3.15M params | hidden=[256] relu dropout=0.0 | sgd lr=0.032 wd=0.001 bs=64 sched=none
+[search  22/30] val 35.30 | train 51.75 | best epoch  3 | 14.69M params | hidden=[1024, 1024, 1024] relu dropout=0.0 | adam lr=0.00017 wd=0.0001 bs=64 sched=cosine
+[search  23/30] val 32.70 | train 34.77 | best epoch  1 | 13.64M params | hidden=[1024, 1024] tanh dropout=0.0 | adam lr=0.00017 wd=0 bs=128 sched=cosine
+[search  24/30] val 32.70 | train 50.26 | best epoch 14 | 12.59M params | hidden=[1024] tanh dropout=0.5 | adam lr=0.00068 wd=0 bs=64 sched=none
+[search  25/30] val 30.40 | train 31.97 | best epoch 13 |  3.15M params | hidden=[256] tanh dropout=0.0 | adam lr=0.0029 wd=0.001 bs=128 sched=cosine
+[search  26/30] val 19.70 | train 20.20 | best epoch  1 | 12.59M params | hidden=[1024] gelu dropout=0.2 | sgd lr=0.018 wd=0 bs=64 sched=none
+[search  27/30] val 33.70 | train 68.88 | best epoch 10 |  3.15M params | hidden=[256] gelu dropout=0.5 | adam lr=0.0009 wd=0.0001 bs=128 sched=none
+[search  28/30] val 34.60 | train 54.40 | best epoch 18 |  3.28M params | hidden=[256, 256, 256] tanh dropout=0.5 | sgd lr=0.018 wd=0 bs=128 sched=cosine
+[search  29/30] val 29.00 | train 41.45 | best epoch 17 |  3.21M params | hidden=[256, 256] gelu dropout=0.2 | sgd lr=0.038 wd=0.001 bs=64 sched=cosine
+[search  30/30] val 34.70 | train 48.38 | best epoch  2 |  6.30M params | hidden=[512] gelu dropout=0.2 | sgd lr=0.011 wd=0.0001 bs=128 sched=cosine
+
+best trials (by validation accuracy, single seed):
+  q2_2/search/trial010: val 37.40 | train 46.22 | best epoch  4 |  6.56M params | hidden=[512, 512] gelu dropout=0.2 | sgd lr=0.0056 wd=0.0001 bs=128 sched=cosine
+  q2_2/search/trial009: val 37.20 | train 62.31 | best epoch 12 | 13.64M params | hidden=[1024, 1024] relu dropout=0.5 | sgd lr=0.013 wd=0.0001 bs=128 sched=none
+  q2_2/search/trial004: val 35.30 | train 38.48 | best epoch  4 | 14.69M params | hidden=[1024, 1024, 1024] gelu dropout=0.5 | adam lr=0.00023 wd=0.0001 bs=128 sched=cosine
+  q2_2/search/trial021: val 35.30 | train 51.75 | best epoch  3 | 14.69M params | hidden=[1024, 1024, 1024] relu dropout=0.0 | adam lr=0.00017 wd=0.0001 bs=64 sched=cosine
+  q2_2/search/trial006: val 35.20 | train 57.52 | best epoch 10 | 14.69M params | hidden=[1024, 1024, 1024] gelu dropout=0.5 | sgd lr=0.007 wd=0.0001 bs=64 sched=cosine
+  q2_2/search/trial029: val 34.70 | train 48.38 | best epoch  2 |  6.30M params | hidden=[512] gelu dropout=0.2 | sgd lr=0.011 wd=0.0001 bs=128 sched=cosine
+  q2_2/search/trial027: val 34.60 | train 54.40 | best epoch 18 |  3.28M params | hidden=[256, 256, 256] tanh dropout=0.5 | sgd lr=0.018 wd=0 bs=128 sched=cosine
+  q2_2/search/trial007: val 34.60 | train 75.05 | best epoch 17 |  6.82M params | hidden=[512, 512, 512] gelu dropout=0.2 | adam lr=0.0016 wd=0.0001 bs=128 sched=cosine
+  q2_2/search/trial001: val 34.40 | train 45.54 | best epoch  3 | 14.69M params | hidden=[1024, 1024, 1024] relu dropout=0.0 | sgd lr=0.0084 wd=0.001 bs=64 sched=none
+  q2_2/search/trial003: val 33.90 | train 46.85 | best epoch  2 |  3.15M params | hidden=[256] gelu dropout=0.0 | sgd lr=0.0056 wd=0 bs=128 sched=cosine
+
+== 2. re-evaluate the top 3 with seeds [0, 1, 2] ==
+[top 1] val 36.10 ± 1.18 | train 58.29 ± 17.50 | hidden=[512, 512] gelu dropout=0.2 | sgd lr=0.0056 wd=0.0001 bs=128 sched=cosine
+[top 2] val 36.50 ± 0.61 | train 53.49 ± 8.41 | hidden=[1024, 1024] relu dropout=0.5 | sgd lr=0.013 wd=0.0001 bs=128 sched=none
+[top 3] val 35.80 ± 0.46 | train 48.16 ± 12.78 | hidden=[1024, 1024, 1024] gelu dropout=0.5 | adam lr=0.00023 wd=0.0001 bs=128 sched=cosine
+selected: hidden=[1024, 1024] relu dropout=0.5 | sgd lr=0.013 wd=0.0001 bs=128 sched=none (val 36.50 ± 0.61)
+
+== 3. final runs of the selected configuration ==
+  seed 0: val 37.20 | train 62.31 | best epoch 12 | 13.64M params | test 30.90
+  seed 1: val 36.20 | train 45.57 | best epoch  6 | 13.64M params | test 29.10
+  seed 2: val 36.10 | train 52.58 | best epoch  8 | 13.64M params | test 29.00
+
+model             params     train            val              test
+linear (Q2.1)      122,890  42.14 ± 3.49  32.20 ± 0.50  26.83 ± 0.83
+mlp_best         13,643,786  53.49 ± 8.41  36.50 ± 0.61  29.67 ± 1.07
+saved /Users/psi/code/uni/deep-learning/figures/q2_2_curves.pdf

@@ -8,13 +8,13 @@ Bullet points for the report, extended after each finished question. All numbers
 - **Model selection:** on validation only. Test is read only for the final numbers. At the end, `train()` restores the epoch with the best val accuracy.
 - **Loss:** cross-entropy (`F.cross_entropy` on the logits, averaged over the batch). Rationale: it is the negative log-likelihood of the softmax model, i.e. maximum likelihood. The gradient w.r.t. the logits is `softmax(z) − onehot(y)`. In the linear case the loss is convex. MSE on the softmax output would have a vanishing gradient for confident wrong predictions.
 - **Normalization:** per channel, with statistics from the training set only (`channel_stats`), applied unchanged to validation and test.
-- **Skeleton code:** `data.py`, `train.py`, `metrics.py` and `load_data.py` are **unchanged**. Our own code is in `models.py`, `common.py` and `tasks/q2_*.py` (incl. the extra experiments `tasks/q2_1_lr_sweep.py` and `tasks/q2_2_activations.py`) and `tasks/q2_3.py`.
+- **Skeleton code:** `data.py`, `train.py`, `metrics.py` and `load_data.py` are **unchanged**. Our own code is in `models.py`, `common.py` and `tasks/q2_*.py` (incl. the extra experiments `tasks/q2_1_lr_sweep.py` and `tasks/q2_2_activations.py`), `tasks/q2_3.py` and `tasks/q2_4.py`. Added to `common.py` for 2.4: `shift_images`, `mask_border`.
 - **No numpy:** all statistics (mean, std, class counts) are computed with torch.
-- **Reproduce:** from the project folder run `python -m tasks.q2_1`, `python -m tasks.q2_2`, etc. Each run is saved as JSON in `results/<name>/seed<k>.json` (config, per-epoch history, accuracies, parameter count).
+- **Reproduce:** from the project folder run `python -m tasks.q2_1`, `python -m tasks.q2_2`, etc. Results are organized per question: `results/q2_1/`, `results/q2_2/`, … (checkpoints likewise in `checkpoints/q2_x/`). Each run is saved as JSON in `results/q2_x/<run>/seed<k>.json` (config, per-epoch history, accuracies, parameter count).
 
 ## Q2.1 Data and linear baseline
 
-**Data** (source: `results/q2_1_data_stats.json`)
+**Data** (source: `results/q2_1/data_stats.json`)
 
 | Split | Images | per class |
 |---|---|---|
@@ -32,7 +32,7 @@ Bullet points for the report, extended after each finished question. All numbers
 - 122,890 parameters: 12,288 × 10 weights + 10 biases.
 - Plain SGD (no momentum), **learning rate 0.0003** (selected on validation, see the sweep below), batch size 64, 50 epochs, no early stopping (so the full curve is visible). Afterwards the best val epoch is restored.
 
-**Learning-rate sweep** (`python -m tasks.q2_1_lr_sweep`, summary in `results/q2_1_lr_sweep.json`)
+**Learning-rate sweep** (`python -m tasks.q2_1_lr_sweep`, summary in `results/q2_1/lr_sweep.json`)
 - Why: the MLP of 2.2 is tuned on validation, so the baseline's learning rate is tuned too. Otherwise part of the MLP's advantage could just come from tuning only one of the two models.
 - Setup: the 2.1 config above, only the lr changes, 3 seeds each, same budget of 50 epochs. Selection by mean val accuracy (same rule as in 2.2). The grid was first 0.0003–0.03; since the best value was at the lower edge, it was extended to 0.00003 and 0.0001 so that the optimum lies inside the grid.
 
@@ -64,8 +64,8 @@ Bullet points for the report, extended after each finished question. All numbers
 **Observations**
 - The best epoch is in the middle of the run (14–30 of 50). After that the model overfits: train loss keeps falling (1.59 at epoch 50), val accuracy drops by 1–3 points (final val 29.3–30.5). Plot: `figures/q2_1_curves.pdf` (mean ± std over seeds).
 - Test is about 5 points below val. Part of this is expected, because the best epoch (and now also the lr) is selected on val, which makes the val value optimistic. The gap is still large, so it deserves a sentence.
-- The first-guess runs with lr 0.001 are kept in `results/linear_lr/0.001/` (identical to the earlier numbers 26.70 ± 0.53 on test, since the runs are deterministic).
-- The seed 0 weights are in `checkpoints/linear/seed0.pt` and are needed for the class templates in 2.4.
+- The first-guess runs with lr 0.001 are kept in `results/q2_1/lr_sweep/0.001/` (identical to the earlier numbers 26.70 ± 0.53 on test, since the runs are deterministic).
+- The seed 0 weights are in `checkpoints/q2_1/linear/seed0.pt` and are needed for the class templates in 2.4.
 
 ## Q2.2 MLP and hyperparameter search
 
@@ -129,7 +129,7 @@ All three use weight decay 1e-4 and batch size 128.
 
 **Activation ablation (ELU, PReLU)**
 - Goal: also test ELU and PReLU without re-running the random search (adding them to the search space would change all 30 sampled configurations).
-- Setup: the chosen configuration is kept fixed, only the activation is swapped, 3 seeds each. ReLU is the chosen model itself (`results/mlp_best/`).
+- Setup: the chosen configuration is kept fixed, only the activation is swapped, 3 seeds each. ReLU is the chosen model itself (`results/q2_2/mlp_best/`).
 - PReLU = torch default `nn.PReLU()`: one learnable negative slope per hidden layer (init 0.25), i.e. only +2 parameters. Weight decay also acts on the slope (pulls it toward 0, i.e. ReLU).
 
 | Activation | Train | Val | Test | best epochs |
@@ -143,17 +143,17 @@ All three use weight decay 1e-4 and batch size 128.
 - ReLU stays the best on val, so the selected model is unchanged. PReLU is within one std of ReLU (0.6 points on val, about the noise level); ELU is about 2.5 points worse, similar to GELU.
 - Caveat for the report: the other hyperparameters (lr, dropout, weight decay) were selected together with ReLU, so this comparison is biased toward ReLU. A fair claim is "with this tuned setup, swapping the activation does not help", not "ReLU is the best activation".
 - The ranking on test is the same as on val except that ELU and GELU swap places (differences there are below the noise level).
-- Script: `python -m tasks.q2_2_activations`; results in `results/mlp_act_<activation>/`, summary in `results/q2_2_activations.json`, log in `results/q2_2_activations_log.txt`. No checkpoints are saved for these runs.
+- Script: `python -m tasks.q2_2_activations`; results in `results/q2_2/activations/<activation>/`, summary in `results/q2_2/activations.json`, log in `results/q2_2/activations_log.txt`. No checkpoints are saved for these runs.
 
 **Files**
 - Learning curves of the 3 seeds: `figures/q2_2_curves.pdf` (a dot marks the best epoch of each)
-- Full search with ranking: `results/q2_2_summary.json`
-- Individual runs: `results/mlp_search/`, `results/mlp_top/`, `results/mlp_best/`
-- Checkpoints for 2.3–2.5: `checkpoints/mlp_best/seed{0,1,2}.pt`
+- Full search with ranking: `results/q2_2/summary.json`
+- Individual runs: `results/q2_2/search/`, `results/q2_2/top/`, `results/q2_2/mlp_best/`
+- Checkpoints for 2.3–2.5: `checkpoints/q2_2/mlp_best/seed{0,1,2}.pt`
 
 ## Q2.3 One-factor-at-a-time study
 
-**Protocol** (`python -m tasks.q2_3`, summary in `results/q2_3_summary.json`, log in `results/q2_3_log.txt`)
+**Protocol** (`python -m tasks.q2_3`, summary in `results/q2_3/summary.json`, log in `results/q2_3/log.txt`)
 - Base = the MLP selected in 2.2: [1024, 1024] ReLU, dropout 0.5, SGD lr 0.013 with momentum 0.9, weight decay 1e-4, batch size 128, no scheduler, normalized inputs, no augmentation.
 - One factor changed at a time, everything else fixed. 7 factors (at least 3 required).
 - **Same budget for every run: 50 epochs, no early stopping.** The best val epoch is restored at the end (as everywhere). The base run with this budget gives exactly the same numbers as `mlp_best` in 2.2 (all best epochs ≤ 12, so patience 8 never cut off a later improvement).
@@ -239,7 +239,8 @@ All three use weight decay 1e-4 and batch size 128.
 **Best model of the study**
 - By mean val accuracy (same rule as in 2.2) the best setting is **base + horizontal flips**: val 37.07 ± 0.85 (seeds: 37.10, 37.90, 36.20). Its advantage over the base (+0.57) is not meaningful, see above.
 - **Test accuracy: 31.27 ± 0.65** (31.30, 31.90, 30.60). For comparison, the base (`mlp_best`, same 50-epoch budget) has 29.67 ± 1.07 on test. The test difference (+1.6) is larger than on val, but test was not used for the choice and the val difference is within noise, so do not over-interpret it.
-- Checkpoints: `checkpoints/q23/flip_True/seed{0,1,2}.pt`. Still open: which model counts as "the best MLP" for 2.4/2.5 (`mlp_best` or the flip model).
+- Checkpoints: `checkpoints/q2_3/flip_True/seed{0,1,2}.pt`.
+- **Decision: `mlp_best` (2.2) stays "the best MLP" for 2.4 and 2.5.** Reasons: the flip model is not meaningfully better on val (+0.57 ± 0.60), and keeping the 2.2 model keeps the story consistent. Also, a model trained with flips has seen (horizontally) transformed images, which would mix augmentation into the shift experiment of 2.4. The flip result is reported as a finding of 2.3 only. Note that per-class accuracies and the confusion matrix above are of the flip model (the study's best by val).
 
 **Per-class test accuracy** (flip model, mean ± std over 3 seeds, 100 test images per class)
 
@@ -256,7 +257,7 @@ All three use weight decay 1e-4 and batch size 128.
 | train | 17.3 ± 7.6 |
 | horse | 9.0 ± 6.2 |
 
-**Confusion matrix** (`figures/q2_3_confusion.pdf`, rows = true class, summed over 3 seeds, i.e. 300 test predictions per true class; raw counts in `results/q2_3_summary.json`)
+**Confusion matrix** (`figures/q2_3_confusion.pdf`, rows = true class, summed over 3 seeds, i.e. 300 test predictions per true class; raw counts in `results/q2_3/summary.json`)
 
 Most frequent confusions (true → predicted, count out of 300):
 
@@ -280,3 +281,65 @@ Most frequent confusions (true → predicted, count out of 300):
 - **Visually similar pairs:** dog ↔ cat (71 and 53; similar size, fur, indoor scenes), train/truck → bus (54, 52; large boxy vehicles on streets/rails), horse → elephant (50). Train and truck are much worse than bus (17 % and 20 % vs 42 %): bus is the "sink" for large road/rail vehicles (346 predictions).
 - **Cat has a very large seed std (± 20.8):** the boundary between cat and dog moves between seeds (dog ± 12.3 as well). Per-class numbers with 100 images per class and 3 seeds are noisy; only the large differences (airplane vs horse) are clearly meaningful.
 - These are hypotheses about the cause; 2.4 (weight visualization, shifts, pixel permutation) can test the "global colour/layout, no local structure" explanation.
+
+## Q2.4 Inductive biases of MLPs
+
+Script: `python -m tasks.q2_4` (summary in `results/q2_4/summary.json`, log in `results/q2_4/log.txt`). Model: `mlp_best` (decision in 2.3). Helpers `shift_images` and `mask_border` are in `common.py`; `shift_accuracies` and `permutation_experiment` in `tasks/q2_4.py` are reused for the CNN in 2.5.
+
+**(a) First-layer weights**
+- Figures: `figures/q2_4_linear_templates.pdf` (10 class templates of the linear baseline, seed 0), `figures/q2_4_class_means.pdf` (mean training image per class), `figures/q2_4_mlp_weights_random.pdf` (8 random hidden units of `mlp_best`, seed 0), `figures/q2_4_mlp_weights_top.pdf` (the 8 units whose weights changed most). Each weight vector is shown as a 64×64 RGB image, grey = 0, scaled per image by its largest |w|. The weights act on normalized inputs, so colours are relative to the training mean colour.
+- **The raw weights look like noise.** Reason: training changes them only a little relative to the random initialization. We rebuilt the exact initialization (same seed, same `set_seed` → `build_model` order as in training) and found: cosine(W, W_init) = 0.90 (MLP) and 0.95 (linear); ‖W − W_init‖ / ‖W_init‖ = 0.49 (MLP) and 0.32 (linear). With 6–30 epochs of SGD the init noise (PyTorch default: uniform ±1/√12288) dominates the picture. So the figures also show the **learned change W − W_init**, which is where the structure is. (Worth one sentence in the report; otherwise the reader sees noise and wonders.)
+- **Quantified with two simple statistics** (mean over units):
+
+| | neighbour corr. (horizontal) | R–G–B corr. |
+|---|---|---|
+| MLP init W_init | 0.000 | – |
+| MLP trained W | 0.155 | 0.147 |
+| MLP learned change W − W_init | **0.818** | **0.809** |
+| Linear trained W | 0.044 | 0.033 |
+| Linear learned change W − W_init | **0.741** | **0.660** |
+
+  Neighbour corr. = correlation between horizontally adjacent weights (0 for i.i.d. noise, near 1 for smooth images). R–G–B corr. = correlation between the three colour channels of a unit (1 = the unit only sees brightness).
+- **Linear templates (W − W_init):** smooth, low-frequency colour blobs that look like the *average scene* of each class, not like the object. Airplane: blue-grey with a horizontal band (sky, horizon); giraffe, elephant, horse: green/yellow-brown (grass, savanna, trees); cat: warm reddish tones (indoor scenes); bus: reddish/pink lower half (red buses, street). No edges, no object shape. This fits the confusion matrix of 2.3: the classifier separates *backgrounds and colour distributions*, so animals on similar outdoor backgrounds get confused (horse → giraffe).
+- **Why the templates show no recognizable objects** (`figures/q2_4_class_means.pdf`): even the *mean training image* of each class shows no object, only a blurred colour/brightness layout (top row). Objects appear at every position, scale and pose, and the cluttered scene covers more of the image than the object, so averaging over 650 images per class leaves only the typical scene. Subtracting the mean image of all classes (bottom row, contrast-stretched) makes the differences visible: airplane = light-blue sky everywhere; bus/train/truck = blue sky at the top, dark road/rails at the bottom; elephant = dark central blob on green/sand; horse = brown blob on green/yellow; giraffe = green top (trees), yellow bottom (savanna); cat/dog = brown/beige indoor tones; motorcycle = dark central shape. A linear classifier has one weight per pixel position, so the best it can do is respond to these position-wise averages. (On centred, aligned data such as MNIST the templates do look like the class; here the data are not aligned.)
+- **The learned templates match the class means quantitatively:** correlation between the template W − W_init of class i and the deviation image (class mean − overall mean, in normalized input space) of class j: mean 0.37 on the diagonal (0.25 train … 0.52 giraffe) vs −0.04 off the diagonal; **for all 10/10 templates the own class has the highest correlation.** So the linear model has essentially learned "class mean scene minus average scene", plus the fine-grained differences between classes. A template is still not a prototype: it is discriminative (positive where the class differs from the others, negative where it lacks something), which is why the correlation is moderate, not ~1.
+- **MLP hidden units (W − W_init):** also smooth and blob-like (neighbour corr. 0.82), mostly global brightness/colour layouts over the whole image (top vs bottom, centre vs border, some colour-opponent blue vs brown units). No localized edge or part detectors as in a CNN: each unit sees all 12,288 pixels and nothing in the architecture prefers local patterns.
+- Interpretation: the smoothness is learned from the data (natural images are smooth, so the gradient, which is a weighted sum of input images, is smooth), not built in. Part (c) confirms this.
+
+**(b) Shifted test images** (no retraining; `figures/q2_4_shifts.pdf`)
+- Test images shifted by k pixels to the right or down, the uncovered border filled with 0 (= training mean colour after normalization). Mean ± std over the 3 seeds.
+- **Control:** shifting also removes a k-pixel strip of the image. To separate the effect of *misalignment* from the *information loss*, the same models were also evaluated on images where the same border is blanked but the image is **not** moved (`mask_border`).
+
+| Shift (px) | 0 | 1 | 2 | 4 | 8 | 12 | 16 |
+|---|---|---|---|---|---|---|---|
+| MLP, right | 29.67 ± 1.07 | 29.10 ± 1.25 | 29.10 ± 0.82 | 29.07 ± 1.27 | 28.03 ± 0.90 | 26.10 ± 1.01 | 24.10 ± 0.85 |
+| MLP, right, border only | 29.67 | 29.97 ± 0.72 | 29.67 ± 1.08 | 29.03 ± 0.46 | 28.97 ± 0.21 | 29.60 ± 0.26 | 28.97 ± 0.32 |
+| MLP, down | 29.67 ± 1.07 | 29.67 ± 1.36 | 29.20 ± 0.75 | 28.20 ± 1.31 | 23.93 ± 1.12 | 21.20 ± 0.17 | 19.30 ± 1.01 |
+| MLP, down, border only | 29.67 | 29.43 ± 1.70 | 29.13 ± 1.46 | 28.67 ± 1.01 | 28.80 ± 0.79 | 28.37 ± 1.33 | 27.60 ± 1.87 |
+| Linear, right | 26.83 ± 0.83 | 26.47 ± 0.91 | 26.47 ± 1.06 | 25.20 ± 0.53 | 24.20 ± 1.51 | 23.67 ± 0.31 | 21.43 ± 0.61 |
+| Linear, down | 26.83 ± 0.83 | 27.17 ± 0.67 | 27.43 ± 0.71 | 24.80 ± 0.95 | 22.17 ± 0.06 | 19.60 ± 1.44 | 18.43 ± 0.31 |
+
+(Linear border-only control at 8–16 px: 25.1–25.9 for right, 24.1–25.4 for down; full numbers incl. 3 and 6 px in the JSON/log.)
+
+- **Blanking the border alone costs almost nothing** (MLP: ≤ 1 point for right shifts, ≤ 2.1 points for down shifts, up to 16 px). So the drop under shifting is due to **misalignment**, not to the lost strip: at 16 px, shifting costs −4.9 (right) and −8.3 (down) points more than blanking the same strip.
+- **Small shifts (1–4 px) barely hurt** (≤ 1.5 points, within the seed std). This is *not* a built-in invariance: it follows from the learned weights being smooth (neighbour corr. 0.82). A 1-pixel shift barely changes the dot product of a smooth template with the image. Accuracy degrades steadily with the shift size, as expected for a model whose weights are tied to absolute pixel positions.
+- **Vertical shifts hurt about twice as much as horizontal ones.** Likely reason: the classes are recognized from the global vertical layout of the scene (sky at the top, ground/grass at the bottom, horizon height), which the templates in (a) show; horizontal position is more variable in photos (objects appear left or right), so the learned templates are more tolerant horizontally.
+- The linear baseline behaves the same way (at 16 px: −5.4 right, −8.4 down vs. unshifted; −3.8 and −5.7 vs. its border-only control), so this is a property of "one weight per pixel position", not of the hidden layers.
+- The MLP stays far above chance (10 %) even at 16 px: much of what it uses (global colour statistics) survives a shift.
+
+**(c) Fixed random pixel permutation** (retrained from scratch)
+- One fixed random permutation of the 64×64 pixel positions (`pixel_permutation(seed=0)`, the same for all 3 channels) applied to train, val and test. The `mlp_best` configuration retrained with the same protocol (3 seeds, at most 50 epochs, early stopping with patience 8 on val). Per-channel normalization statistics are unchanged by a permutation. Results in `results/q2_4/mlp_perm/`, checkpoints in `checkpoints/q2_4/mlp_perm/`.
+
+| Pixels | Train | Val | Test | Best epochs |
+|---|---|---|---|---|
+| original (`mlp_best`) | 53.49 ± 8.41 | 36.50 ± 0.61 | 29.67 ± 1.07 | 12, 6, 8 |
+| permuted (`mlp_perm`) | 51.62 ± 11.64 | 35.60 ± 0.80 | 30.20 ± 1.15 | 12, 8, 4 |
+
+- **No meaningful difference** (val −0.90 ± 0.58, test +0.53 ± 0.89; both < 2·SE). The permuted images are unrecognizable for a human, but the MLP learns them just as well.
+- **Why, exactly:** the first layer computes W x. For a permutation matrix P, W (P x) = (W P) x, so an MLP with weights W P on the original images computes the same function as an MLP with weights W on permuted images. The initialization is i.i.d. over the inputs (its distribution does not change if the columns of W are permuted), and SGD updates commute with the permutation. So training on permuted pixels is the same learning problem up to relabelling the input dimensions: the MLP is **invariant to the order of its inputs as a learning algorithm**. The small differences come only from different random draws (the init is not permuted along with the data).
+- `figures/q2_4_perm_weights.pdf`: the learned change W − W_init of the permuted model looks like noise as learned (neighbour corr. 0.033), but after mapping it back to the original pixel layout it is smooth again (0.819, the same as the original MLP's 0.818) and shows the same kind of colour blobs. The model learned the same thing, just in a scrambled coordinate system.
+
+**What this says about the MLP's assumptions (for the report)**
+- An MLP makes **no assumption about the spatial structure of images**: it does not know which pixels are neighbours (c), and it has no weight sharing across positions, so a pattern learned at one position does not transfer to another (b). Every pixel position is an independent input feature.
+- What looks like structure in its weights (smooth templates, robustness to 1–4 px shifts) is learned from the data, and it costs data: with 6500 images the MLP can only learn coarse global colour/layout templates (a), which explains the confusions between classes with similar backgrounds (2.3) and the strong overfitting (12.6M first-layer parameters, one per pixel and unit).
+- A CNN builds in exactly the two missing assumptions, locality (small kernels) and translation equivariance (weight sharing). The prediction for 2.5: the CNN should handle shifts much better and should lose a lot of accuracy on permuted pixels, because the permutation destroys the local neighbourhoods its kernels rely on.

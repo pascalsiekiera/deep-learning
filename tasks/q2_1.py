@@ -1,8 +1,8 @@
 """Q2.1: data statistics and a linear baseline (multinomial logistic regression, plain SGD).
 
     python -m tasks.q2_1      # (from the project root) trains 3 seeds, prints the statistics and accuracies
-                              # writes results/q2_1_data_stats.json, results/linear/,
-                              # checkpoints/linear/, figures/q2_1_curves.pdf
+                              # writes results/q2_1/data_stats.json, results/q2_1/linear/,
+                              # checkpoints/q2_1/linear/, figures/q2_1_curves.pdf
     python -m tasks.q2_1 --stats-only   # only the data statistics (no training)
 """
 
@@ -17,7 +17,7 @@ from common import RESULTS_DIR, ROOT, fmt, get_data, load_results, run_seeds
 from data import channel_stats
 from load_data import CLASSES, SPLITS
 
-NAME = "linear"
+NAME = "q2_1/linear"
 CONFIG = {
     "hidden": (),          # no hidden layer
     "optimizer": "sgd",
@@ -27,7 +27,7 @@ CONFIG = {
     "patience": None,      # show the full curve; the best validation epoch is restored anyway
 }
 FIGURES_DIR = os.path.join(ROOT, "figures")
-STATS_PATH = os.path.join(RESULTS_DIR, "q2_1_data_stats.json")
+STATS_PATH = os.path.join(RESULTS_DIR, "q2_1", "data_stats.json")
 
 
 def data_statistics(path=STATS_PATH):

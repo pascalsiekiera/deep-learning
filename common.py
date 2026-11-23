@@ -4,7 +4,7 @@ running one configuration over several seeds, and saving every run as JSON in re
 A config is a plain dict; any key left out takes its value from DEFAULTS. Example:
 
     from common import run_seeds
-    results = run_seeds("mlp_best", {"hidden": (512,), "optimizer": "adam", "lr": 1e-3})
+    results = run_seeds("q2_2/my_mlp", {"hidden": (512,), "optimizer": "adam", "lr": 1e-3})
     print(results["test_acc"])        # {"mean": ..., "std": ..., "values": [...]}
 """
 
@@ -66,6 +66,34 @@ def permute_pixels(images, perm):
     images: (N, C, H, W) -> (N, C, H, W)."""
     n, c, h, w = images.shape
     return images.reshape(n, c, h * w)[:, :, perm].reshape(n, c, h, w)
+
+
+def shift_images(images, dx=0, dy=0, fill=0.0):
+    """Translate a batch (N, C, H, W) by dx pixels to the right and dy pixels down (negative =
+    left / up), without wrap-around: the uncovered border is set to `fill`. Applied to
+    normalized images, fill=0 is the training-set mean colour (Q2.4 (i), Q2.5)."""
+    n, c, h, w = images.shape
+    out = torch.full_like(images, fill)
+    ys, yd = (slice(0, h - dy), slice(dy, h)) if dy >= 0 else (slice(-dy, h), slice(0, h + dy))
+    xs, xd = (slice(0, w - dx), slice(dx, w)) if dx >= 0 else (slice(-dx, w), slice(0, w + dx))
+    out[:, :, yd, xd] = images[:, :, ys, xs]
+    return out
+
+
+def mask_border(images, dx=0, dy=0, fill=0.0):
+    """Control for shift_images: blank exactly the border that shift_images(images, dx, dy)
+    would uncover, but leave the rest of the image where it is (same information loss, no
+    misalignment)."""
+    out = images.clone()
+    if dx > 0:
+        out[..., :, :dx] = fill
+    elif dx < 0:
+        out[..., :, dx:] = fill
+    if dy > 0:
+        out[..., :dy, :] = fill
+    elif dy < 0:
+        out[..., dy:, :] = fill
+    return out
 
 
 def get_datasets(config):

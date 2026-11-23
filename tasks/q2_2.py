@@ -13,8 +13,8 @@ Protocol (all decisions use validation accuracy; the test set is only read for t
     python -m tasks.q2_2 --trials 40      # a larger search
 
 Finished runs are skipped when the script is restarted, so an interrupted search resumes.
-Writes results/mlp_search/, results/mlp_top/, results/mlp_best/, checkpoints/mlp_best/,
-results/q2_2_summary.json and figures/q2_2_curves.pdf.
+Writes results/q2_2/{search,top,mlp_best}/, checkpoints/q2_2/mlp_best/,
+results/q2_2/summary.json and figures/q2_2_curves.pdf.
 """
 
 import argparse
@@ -46,6 +46,7 @@ FIXED = {
     "momentum": 0.9,  # used by SGD only
 }
 SAMPLING_SEED = 0
+BEST = "q2_2/mlp_best"   # run name of the selected MLP ("the best MLP" in Q2.3-Q2.5)
 SEARCH_SEED = 0
 
 
@@ -108,7 +109,7 @@ def random_search(num_trials):
     configs = [sample_config(generator) for _ in range(num_trials)]
     results = []
     for i, config in enumerate(configs):
-        result = cached_run(f"mlp_search/trial{i:03d}", config, SEARCH_SEED)
+        result = cached_run(f"q2_2/search/trial{i:03d}", config, SEARCH_SEED)
         print(f"[search {i + 1:3d}/{num_trials}] {line(result)} | {describe(config)}", flush=True)
         results.append(result)
     return results
@@ -119,7 +120,7 @@ def reevaluate(candidates):
     scored = []
     for rank, result in enumerate(candidates):
         config = result["config"]
-        runs = [cached_run(f"mlp_top/rank{rank}", config, seed) for seed in SEEDS]
+        runs = [cached_run(f"q2_2/top/rank{rank}", config, seed) for seed in SEEDS]
         stats = {key: mean_std([r[key] for r in runs]) for key in ("train_acc", "val_acc")}
         print(f"[top {rank + 1}] val {fmt(stats['val_acc'])} | train {fmt(stats['train_acc'])} "
               f"| {describe(config)}", flush=True)
@@ -145,7 +146,7 @@ def main():
     print(f"selected: {describe(best_config)} (val {fmt(best_stats['val_acc'])})")
 
     print("\n== 3. final runs of the selected configuration ==")
-    runs = [cached_run("mlp_best", best_config, seed, save_model=True) for seed in SEEDS]
+    runs = [cached_run(BEST, best_config, seed, save_model=True) for seed in SEEDS]
     for r in runs:
         print(f"  seed {r['seed']}: {line(r)} | test {100 * r['test_acc']:.2f}")
     summary = {key: mean_std([r[key] for r in runs]) for key in ("train_acc", "val_acc", "test_acc")}
@@ -153,7 +154,7 @@ def main():
     print("\nmodel             params     train            val              test")
     rows = [("mlp_best", runs, summary)]
     try:
-        linear = load_results("linear")
+        linear = load_results("q2_1/linear")
         rows.insert(0, ("linear (Q2.1)", linear,
                         {k: mean_std([r[k] for r in linear]) for k in ("train_acc", "val_acc", "test_acc")}))
     except FileNotFoundError:
@@ -162,7 +163,7 @@ def main():
         print(f"{name:16s} {rs[0]['num_parameters']:>9,}  {fmt(s['train_acc'])}  "
               f"{fmt(s['val_acc'])}  {fmt(s['test_acc'])}")
 
-    with open(os.path.join(RESULTS_DIR, "q2_2_summary.json"), "w") as f:
+    with open(os.path.join(RESULTS_DIR, "q2_2", "summary.json"), "w") as f:
         json.dump({"search_space": SEARCH_SPACE, "fixed": FIXED, "trials": args.trials,
                    "top": args.top, "selected_config": best_config,
                    "search_ranking": [{"name": r["name"], "val_acc": r["val_acc"],
