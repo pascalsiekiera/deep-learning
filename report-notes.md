@@ -494,3 +494,48 @@ Cost of the shift beyond losing the same content (shift − lost-strip control) 
 - What the convolution gains: far fewer parameters (less overfitting with 6500 images), and the same detector at every position (a feature learned in one place works everywhere, i.e. it learns from all positions at once). Together with pooling this gives (approximate) translation invariance (Q1.1(b)): small shifts do nothing, large shifts cost much less than for the MLP.
 - What it gives up: it cannot represent arbitrary linear maps of the image, in particular ones that combine distant pixels or depend on absolute position (Q1.1(b): equivariant ⇔ circulant). This is a restriction only if the data violate the locality/stationarity assumption, which is exactly what the permutation does: there the CNN loses its advantage completely, while the MLP, having no such prior, does not care.
 - In short: the CNN's large gain on real images and its collapse on permuted images are two sides of the same inductive bias.
+
+# Part 3: Image captioning
+
+## Q3.1 Text preprocessing
+
+Code: `text.py` (`tokenize`, `Vocabulary`); script `python -m tasks.q3_1.text_stats` (summary in `results/q3_1/summary.json`, vocabulary in `results/q3_1/vocab.json`, log in `results/q3_1/log.txt`, figure `figures/q3_1/caption_lengths.pdf`).
+
+**Tokenizer** (own implementation, one regular expression)
+- Lowercase; a token is either a word (letters/digits, optionally with one apostrophe part, so "man's", "don't" stay one token) or a single punctuation character; everything else (whitespace) separates tokens. Example: "A green semi-truck drives down a shaded street." → `a green semi - truck drives down a shaded street .`
+- Separating punctuation matters for the class mention metric in 3.3(b): "semi-truck" yields the token "truck".
+
+**Vocabulary** (built from the 32,500 training captions only)
+- Special tokens: `<pad>` = 0, `<bos>` = 1, `<eos>` = 2, `<unk>` = 3; then the words by decreasing training frequency (ties alphabetically, so the vocabulary is deterministic).
+- `encode(caption) = [<bos>] + ids + [<eos>]`, words not in the vocabulary → `<unk>`. This is the `encode` passed to `caption_loaders`, with `pad_id = 0`.
+- **Frequency threshold: min_count = 5** (words seen fewer than 5 times in the training captions → `<unk>`).
+
+| min_count | Vocabulary size (incl. 4 special) | Val `<unk>` tokens | Val captions with ≥ 1 `<unk>` |
+|---|---|---|---|
+| 1 | 6,625 | 0.88 % | 8.32 % |
+| 2 | 3,881 | 1.37 % | 12.42 % |
+| 3 | 2,955 | 1.77 % | 15.84 % |
+| **5** | **2,193** | **2.36 %** | **20.52 %** |
+| 10 | 1,451 | 3.57 % | 29.24 % |
+| 20 | 950 | 5.40 % | 40.28 % |
+
+- Rationale: 6,621 distinct training tokens, 4,432 of them (67 %) occur fewer than 5 times but together cover only 1.99 % of the training tokens (mostly typos, rare names, numbers: the captions contain the typos of real annotators, e.g. "tuck" for "truck"). With min_count = 5 the vocabulary shrinks by 3× (fewer output-layer parameters, no embeddings for words seen 1–4 times that cannot be learned well), while only 2.4 % of the validation tokens become `<unk>`. Even with min_count = 1, 0.9 % of the val tokens are unseen words.
+- **Reported numbers: vocabulary size 2,193 (2,189 words + 4 special tokens); `<unk>` fraction in the validation captions 2.36 % of 55,155 tokens** (20.5 % of the validation captions contain at least one `<unk>`). Train 1.99 %, test 2.44 %.
+- Most frequent words: a (50,179), . (24,491), the, on, in, of, is, with, and, to, an, then train, standing, cat, dog, bus, two, next, parked, truck: function words dominate, and the class names are among the most frequent content words.
+
+**Caption lengths** (tokens incl. punctuation, without `<bos>`/`<eos>`)
+
+| Split | Captions | Mean ± std | Min | Median | 95 % | 99 % | Max | ≤ 15 tokens |
+|---|---|---|---|---|---|---|---|---|
+| Train | 32,500 | 11.11 ± 2.42 | 7 | 11 | 15 | 20 | 53 | 95.7 % |
+| Validation | 5,000 | 11.03 ± 2.20 | 7 | 11 | 15 | 18 | 27 | 96.2 % |
+| Test | 5,000 | 11.02 ± 2.30 | 7 | 11 | 15 | 19 | 43 | 95.8 % |
+
+- Matches the project statement (about 11 tokens, 95 % with at most 15). Short and narrowly distributed (mode 10, IQR 10–12), with a long right tail (a few captions of 40–53 tokens). The three splits have the same distribution. (Figure: `figures/q3_1/caption_lengths.pdf`.)
+- Reference point for 3.3(b): the human reference captions mention the image's class (with `class_mention_accuracy` and our tokenizer) in 93.5 % (train), 95.2 % (val), 95.4 % (test) of the cases.
+
+**How the provided loaders batch captions of different lengths, and how padding is ignored**
+- `caption_loaders` builds a `CaptionDataset` with one item per (image, caption) pair: every image appears 5 times per epoch, so an epoch has 32,500 training items. `encode` is applied once, when the dataset is built.
+- `PadCollate` stacks the images and right-pads the captions with `pad_id` to the length of the **longest caption in the mini-batch** (`pad_sequence(..., batch_first=True)`), giving `captions (B, T)` with T varying per batch. Example (batch size 64): the first three training batches have T = 19, 23, 26; a short caption becomes `<bos> red double decker bus on a city street <eos> <pad> × 9`. Over one epoch, 41.8 % of the caption tensor entries are padding (long outlier captions make whole batches long).
+- **Ignoring padding in the loss:** with teacher forcing the decoder input is `captions[:, :-1]` and the target is `captions[:, 1:]`; the token-level cross-entropy is computed with `F.cross_entropy(..., ignore_index=pad_id)`, so positions whose target is `<pad>` contribute neither to the loss nor to the gradient, and the mean is taken over real target tokens only (each caption's `<eos>` is still a target, so the model learns when to stop). Check in the script: for random logits, appending 5 extra `<pad>` columns leaves the loss with `ignore_index` exactly unchanged (8.15563 → 8.15563), while counting pads as targets changes it (8.16371 → 8.15813). Perplexity = exp(mean loss over real tokens).
+- The decoder's outputs at padded input positions are computed but ignored; since padding is on the right, a unidirectional RNN never reads a `<pad>` before a real token, so padding cannot influence the predictions of real tokens.

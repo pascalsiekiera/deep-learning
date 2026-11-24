@@ -1,0 +1,31 @@
+== vocabulary size vs. frequency threshold (built from the training captions) ==
+min_count | vocab size (incl. 4 special) | val <unk> tokens | val captions with <unk>
+        1 |                         6625 |            0.88% |   8.32%
+        2 |                         3881 |            1.37% |  12.42%
+        3 |                         2955 |            1.77% |  15.84%
+        5 |                         2193 |            2.36% |  20.52%
+       10 |                         1451 |            3.57% |  29.24%
+       20 |                          950 |            5.40% |  40.28%
+
+chosen min_count = 5: vocabulary size 2193 (2189 words + <pad>, <bos>, <eos>, <unk>)
+distinct training tokens: 6621, of which 4432 occur < 5 times; they cover 1.99% of the training tokens
+train      <unk> tokens 1.99% of 361034 tokens | captions with <unk> 17.91%
+validation <unk> tokens 2.36% of 55155 tokens | captions with <unk> 20.52%
+test       <unk> tokens 2.44% of 55077 tokens | captions with <unk> 21.26%
+20 most frequent words: [('a', 50179), ('.', 24491), ('the', 13176), ('on', 11790), ('in', 10110), ('of', 9784), ('is', 6371), ('with', 5588), ('and', 5438), ('to', 4557), ('an', 4423), ('train', 3518), ('standing', 3417), ('cat', 3195), ('dog', 3182), ('bus', 3027), ('two', 2991), ('next', 2910), ('parked', 2710), ('truck', 2598)]
+
+== caption lengths (tokens incl. punctuation, without <bos>/<eos>) ==
+train      mean 11.11 ± 2.42 | min 7 | max 53 | 5% 8 25% 10 50% 11 75% 12 95% 15 99% 20 | <= 15 tokens: 95.7%
+validation mean 11.03 ± 2.20 | min 7 | max 27 | 5% 8 25% 9 50% 11 75% 12 95% 15 99% 18 | <= 15 tokens: 96.2%
+test       mean 11.02 ± 2.30 | min 7 | max 43 | 5% 8 25% 9 50% 11 75% 12 95% 15 99% 19 | <= 15 tokens: 95.8%
+saved /Users/psi/code/uni/deep-learning/figures/q3_1/caption_lengths.pdf
+
+class mention accuracy of the human reference captions: {'train': 93.49, 'validation': 95.18, 'test': 95.38}
+
+== batching with caption_loaders (batch size 64) ==
+first batches (images, captions) shapes: [[[64, 3, 64, 64], [64, 19]], [[64, 3, 64, 64], [64, 23]], [[64, 3, 64, 64], [64, 26]]]
+pad fraction in these batches: [0.306, 0.437, 0.492] | over one epoch: 41.8%
+example from batch 0, longest caption: ['<bos>', 'a', 'woman', 'wearing', 'white', 'pants', 'and', 'a', 'black', 'coat', 'with', 'a', 'top', 'hat', 'riding', 'a', 'horse', '.']
+example from batch 0, shortest caption as padded row: ['<bos>', 'red', 'double', 'decker', 'bus', 'on', 'a', 'city', 'street', '<eos>', '<pad>', '<pad>', '<pad>', '<pad>', '<pad>', '<pad>', '<pad>', '<pad>', '<pad>']
+loss with ignore_index=<pad>: {'original': 8.155632972717285, 'with_5_extra_pad_columns': 8.155632972717285}
+loss counting <pad> as a target: {'original': 8.163714408874512, 'with_5_extra_pad_columns': 8.158132553100586}

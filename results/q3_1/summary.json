@@ -1,0 +1,208 @@
+{
+ "min_count": 5,
+ "vocab_size": 2193,
+ "by_threshold": {
+  "1": {
+   "vocab_size": 6625,
+   "unk_token_fraction": 0.008775269694497326,
+   "captions_with_unk": 0.0832,
+   "tokens": 55155
+  },
+  "2": {
+   "vocab_size": 3881,
+   "unk_token_fraction": 0.013688695494515457,
+   "captions_with_unk": 0.1242,
+   "tokens": 55155
+  },
+  "3": {
+   "vocab_size": 2955,
+   "unk_token_fraction": 0.017677454446559694,
+   "captions_with_unk": 0.1584,
+   "tokens": 55155
+  },
+  "5": {
+   "vocab_size": 2193,
+   "unk_token_fraction": 0.023642462152116763,
+   "captions_with_unk": 0.2052,
+   "tokens": 55155
+  },
+  "10": {
+   "vocab_size": 1451,
+   "unk_token_fraction": 0.03566313117577735,
+   "captions_with_unk": 0.2924,
+   "tokens": 55155
+  },
+  "20": {
+   "vocab_size": 950,
+   "unk_token_fraction": 0.05399329163267156,
+   "captions_with_unk": 0.4028,
+   "tokens": 55155
+  }
+ },
+ "unk": {
+  "train": {
+   "unk_token_fraction": 0.019865165053706852,
+   "captions_with_unk": 0.17907692307692308,
+   "tokens": 361034
+  },
+  "validation": {
+   "unk_token_fraction": 0.023642462152116763,
+   "captions_with_unk": 0.2052,
+   "tokens": 55155
+  },
+  "test": {
+   "unk_token_fraction": 0.024365887757140003,
+   "captions_with_unk": 0.2126,
+   "tokens": 55077
+  }
+ },
+ "lengths": {
+  "train": {
+   "mean": 11.108738899230957,
+   "std": 2.4248433113098145,
+   "min": 7,
+   "max": 53,
+   "quantiles": {
+    "5%": 8.0,
+    "25%": 10.0,
+    "50%": 11.0,
+    "75%": 12.0,
+    "95%": 15.0,
+    "99%": 20.0
+   },
+   "fraction_le_15": 0.9566769003868103
+  },
+  "validation": {
+   "mean": 11.031000137329102,
+   "std": 2.196133852005005,
+   "min": 7,
+   "max": 27,
+   "quantiles": {
+    "5%": 8.0,
+    "25%": 9.0,
+    "50%": 11.0,
+    "75%": 12.0,
+    "95%": 15.0,
+    "99%": 18.0
+   },
+   "fraction_le_15": 0.9621999859809875
+  },
+  "test": {
+   "mean": 11.015399932861328,
+   "std": 2.3029162883758545,
+   "min": 7,
+   "max": 43,
+   "quantiles": {
+    "5%": 8.0,
+    "25%": 9.0,
+    "50%": 11.0,
+    "75%": 12.0,
+    "95%": 15.0,
+    "99%": 19.0
+   },
+   "fraction_le_15": 0.9584000110626221
+  }
+ },
+ "reference_class_mention": {
+  "train": 0.9348923076923077,
+  "validation": 0.9518,
+  "test": 0.9538
+ },
+ "batching": {
+  "first_batches_shapes_images_captions": [
+   [
+    [
+     64,
+     3,
+     64,
+     64
+    ],
+    [
+     64,
+     19
+    ]
+   ],
+   [
+    [
+     64,
+     3,
+     64,
+     64
+    ],
+    [
+     64,
+     23
+    ]
+   ],
+   [
+    [
+     64,
+     3,
+     64,
+     64
+    ],
+    [
+     64,
+     26
+    ]
+   ]
+  ],
+  "first_batches_pad_fraction": [
+   0.3059210526315789,
+   0.436820652173913,
+   0.49158653846153844
+  ],
+  "epoch_pad_fraction": 0.4183899698023776,
+  "example_batch0": {
+   "longest": [
+    "<bos>",
+    "a",
+    "woman",
+    "wearing",
+    "white",
+    "pants",
+    "and",
+    "a",
+    "black",
+    "coat",
+    "with",
+    "a",
+    "top",
+    "hat",
+    "riding",
+    "a",
+    "horse",
+    "."
+   ],
+   "padded_row": [
+    "<bos>",
+    "red",
+    "double",
+    "decker",
+    "bus",
+    "on",
+    "a",
+    "city",
+    "street",
+    "<eos>",
+    "<pad>",
+    "<pad>",
+    "<pad>",
+    "<pad>",
+    "<pad>",
+    "<pad>",
+    "<pad>",
+    "<pad>",
+    "<pad>"
+   ]
+  },
+  "loss_ignore_pad": {
+   "original": 8.155632972717285,
+   "with_5_extra_pad_columns": 8.155632972717285
+  },
+  "loss_counting_pad": {
+   "original": 8.163714408874512,
+   "with_5_extra_pad_columns": 8.158132553100586
+  }
+ }
+}
