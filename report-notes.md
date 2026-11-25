@@ -654,3 +654,70 @@ Code: `tasks/q3_3/encoders.py` (3.3 a; log `results/q3_3/log.txt`, summary `resu
 - **Class mention accuracy:** whether that information reaches the caption (one keyword); it ignores everything else in the sentence and gives no credit for synonyms outside the list (small effect here, see above).
 - **BLEU-4:** n-gram overlap with 5 references, i.e. wording, scene and fluency; the class word is only one of ~11 tokens, so a caption with the right class but generic wording can still score low and a fluent caption of a frequent template can score well (the MLP-scratch "language model" gets BLEU 3.7–7.9 with 10 % mention).
 - **Perplexity:** how probable the reference captions are under the model with teacher forcing; it measures the language model plus image conditioning, and can be good without image information (MLP scratch 13.05 < MLP frozen 13.87). None of these metrics alone says whether a caption is correct; they agree across very different encoders but disagree within a family.
+
+## Q3.4 Decoding
+
+Code: `Captioner.beam_search` in `models.py`; script `python -m tasks.q3_4.decoding` (log `results/q3_4/log.txt`, per-seed captions `results/q3_4/seed<k>.json`, summary + examples `results/q3_4/summary.json`, figure `figures/q3_4/tradeoffs.pdf`).
+
+### (a) Beam search vs greedy
+
+**Implementation** (batched over images, uses `Captioner.step`)
+- Every image keeps K unfinished hypotheses with their summed log-probability log p(y₁…y_t | x). At each step all K·V extensions are scored, and the 2K best are taken (at least K of them do not end in `<eos>`).
+- An extension that ends with `<eos>` and is among the K best goes to the image's list of **finished captions**. The beam is refilled with the best K extensions that do not end in `<eos>`.
+- An image is done once it has K finished captions (fairseq-style stopping). Hypotheses still open after 25 tokens would also count as candidates, but this never happened.
+- The returned caption is the finished one with the highest **log p(y | x)** or, with length normalization, the highest **log p(y | x) / L** (L = number of tokens including `<eos>`).
+- All open hypotheses at step t have the same length t, so normalization cannot change the pruning inside the beam. It only changes **which finished caption wins** when finished captions have different lengths.
+- Check: beam size 1 reproduces the stored greedy captions exactly (100 % identical on val and test, all seeds). For beam size 1 both rankings are identical (only one finished caption).
+- Model: the selected captioner of Q3.2 (frozen CNN, concat_image), seeds 0, 1, 2; no retraining. Beam size 10 was added as an extra point.
+
+**Results** (test, mean ± std over 3 seeds; validation in the log shows the same picture)
+
+| Decoding | BLEU-4 | Mean length | Distinct words | Distinct bigrams | Distinct captions (of 1,000) | Class mention | Mean log p(y \| x) | Repeated bigram |
+|---|---|---|---|---|---|---|---|---|
+| greedy (beam 1) | 14.02 ± 0.83 | 10.96 | 187 ± 7 | 534 ± 23 | 415 | 68.6 % | −9.71 | 4.9 % |
+| beam 3 | 15.46 ± 0.66 | 10.44 | 173 ± 6 | 470 ± 22 | 343 | 69.2 % | −8.00 | 3.3 % |
+| beam 3, norm. | 15.36 ± 0.68 | 10.99 | 178 ± 9 | 489 ± 15 | 366 | 69.3 % | −8.23 | 4.6 % |
+| beam 5 | **16.27 ± 0.41** | 10.27 | 165 ± 3 | 429 ± 22 | 287 | 69.5 % | −7.66 | 2.6 % |
+| beam 5, norm. | 15.80 ± 0.29 | 11.01 | 174 ± 5 | 456 ± 32 | 317 | 69.2 % | −7.96 | 4.5 % |
+| beam 10 (extra) | 16.79 ± 0.53 | 10.13 | 156 ± 6 | 383 ± 20 | 228 | 69.3 % | −7.38 | 2.6 % |
+| beam 10, norm. (extra) | 16.24 ± 0.45 | 11.00 | 163 ± 5 | 408 ± 14 | 257 | 69.4 % | −7.69 | 4.8 % |
+
+Validation BLEU-4: greedy 14.91, beam 3 16.89 / 16.64 (norm.), beam 5 17.15 / 16.81, beam 10 17.53 / 17.15.
+
+**Findings and trade-offs**
+- **Beam search finds more probable captions and gets higher BLEU.** Mean log p(y | x) rises from −9.71 (greedy) to −7.66 (beam 5) and −7.38 (beam 10). Test BLEU-4 rises by +2.25 with beam 5. The gain is the same for each seed (paired, per seed: +1.66, +2.45, +2.64 test; +1.86, +2.41, +2.45 val), so it is clearly not noise. Most of the gain comes from beam 3. Beam 5 → 10 adds only +0.5 on test, and on validation the per-seed differences are +0.98, −0.12 and +0.27, so the effect is inconsistent.
+- **Greedy is often not the most probable caption:** with beam 3, only 20 % of the captions are identical to greedy, and with beam 10 only 12 %.
+- **Without normalization, larger beams make captions shorter:** mean length 10.96 → 10.44 → 10.27 → 10.13 (beam 1 → 3 → 5 → 10). Captions of ≤ 8 tokens increase (seed 0: 1.2 % → 7.2 %). The final "." is dropped more often (seed 1: 3.7 % → 8.2 % of captions end without "."), e.g. "a large air plane on a run way" instead of "a large airplane sitting on top of an airport runway ." (beam 5 norm.). This is the bias toward short captions explained in (b).
+- **Length normalization removes the length bias:** the mean length stays at 11.0, the same as greedy and close to the references (11.1). Its captions are slightly less probable (−7.96 vs −7.66 at beam 5) and score slightly lower BLEU (−0.1 to −0.6). The differences are small but have the same sign in 8 of 9 test (beam, seed) pairs. The shorter, safer unnormalized captions match the references a bit better in n-grams.
+- **Diversity falls as the beam grows:** distinct bigrams drop 534 → 429 → 383 and distinct captions 415 → 287 → 228 (greedy → beam 5 → beam 10). Beam search moves every image toward the most probable, most generic phrasing of its class ("a motorcycle parked on the side of a road ." instead of "a man riding a motorcycle down a street next to a green tent ."). Length normalization keeps somewhat more diversity (+15–30 bigrams) because it allows longer, more specific endings.
+- **So BLEU and diversity trade off.** Beam search optimizes the model probability, which rewards the frequent n-grams that BLEU also rewards. Specific details that are right in some images disappear, and wrong details are no longer produced as often. Repeated bigrams (the "a black and white photo of a black and white photo" failure) become less frequent without normalization (4.9 % → 2.6 %); with normalization the rate stays at ~4.6 %.
+- **Class mention does not change (68.6–69.5 %):** the class is decided by the image vector (see 3.3 b), and decoding only changes the wording. Beam search cannot fix encoder errors (e.g. dog #8 is described as a "black and white cat" by every setting).
+- **Cost:** K hypotheses per image, i.e. K times the decoder computation per step (here a few seconds per 1,000 images for all settings; our bookkeeping is in Python, so the time measurement is not meaningful).
+- **Choice:** beam 5 with log-probability ranking. It has high validation BLEU, and beam 10 is not consistently better while losing more diversity. Length normalization is the better choice if caption length or diversity matter more than BLEU.
+
+### (b) Theory
+
+**(i) Greedy does not return the most probable caption.** Vocabulary {a, b, `<eos>`}.
+- Step 1: p(a | x) = 0.6, p(b | x) = 0.4, p(`<eos>` | x) = 0.
+- After "a": p(a | a) = 0.3, p(b | a) = 0.3, p(`<eos>` | a) = 0.4.
+- After "b": p(`<eos>` | b) = 0.9, p(a | b) = p(b | b) = 0.05.
+- Greedy picks a (0.6), then `<eos>` (0.4): p(a `<eos>` | x) = 0.6 · 0.4 = **0.24**.
+- But p(b `<eos>` | x) = 0.4 · 0.9 = **0.36**.
+- Every caption that starts with "a" has probability ≤ 0.6 · 0.4 = 0.24, so "b `<eos>`" is the most probable caption. Greedy commits to the locally best first word and never sees that "a" leads to a flat, uncertain continuation. A beam of size 2 would keep "b" and find it. Q3.4(a) shows the same thing in practice: greedy and beam 3 agree on only 20 % of the images.
+
+**(ii) Prefix probabilities never increase.** By the chain rule,
+p(y₁, …, y_{t+1} | x) = p(y₁, …, y_t | x) · p(y_{t+1} | y₁, …, y_t, x) ≤ p(y₁, …, y_t | x),
+because the conditional probability is ≤ 1. Equivalently, log p(y₁…y_t | x) = Σ_{s≤t} log p(y_s | y_{<s}, x) is a sum of terms ≤ 0, so it can only decrease as t grows (strictly, unless the model is certain of the next token).
+
+*Why exact maximization favors short captions:*
+- A complete caption of length L is a prefix followed by `<eos>`, and every additional token multiplies its probability by another factor < 1.
+- A long caption must therefore be "paid for" at every step. Ending early costs only the one factor p(`<eos>` | prefix).
+- Unless the model gives `<eos>` a very small probability after short prefixes, a short caption ("a cat on a rug", or in the extreme an almost empty caption) has a higher total probability than a longer, more informative one, even if every word of the long one is likely (e.g. a 10-token caption whose tokens each have probability 0.8 has 0.8¹⁰ ≈ 0.107, less than a 6-token caption with 0.7 per token, 0.7⁶ ≈ 0.118, although every token of the long caption is more likely).
+- The better the search approximates the arg max, the more short captions it finds. This is what (a) shows: mean length 10.96 → 10.13 from greedy to beam 10 without normalization, and the final "." gets dropped.
+
+*Length normalization:*
+- Ranking by log p(y | x) / L compares the **average log-probability per token**, i.e. the geometric mean of the per-token probabilities, (Π p(y_t | …))^{1/L}.
+- The linear growth of the penalty with L is removed. A longer caption wins if its tokens are on average as likely as those of the shorter one.
+- In the example above, the 10 × 0.8 caption (average log p = log 0.8) beats the 6 × 0.7 caption (log 0.7).
+- In (a), normalization keeps the mean length at 11.0 for all beam sizes.
+- It can over-correct, favoring long captions with many easy tokens. A softer variant divides by L^α (α ∈ [0, 1]) or by the GNMT penalty ((5 + L)/6)^α, which interpolates between no normalization (α = 0) and full normalization (α = 1).

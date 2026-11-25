@@ -4,7 +4,7 @@ This repository contains our code for the course project. The first section desc
 and how to reproduce every table and figure of the report; the second section is the original
 description of the provided skeleton code.
 
-## Our code (Part 2: image classification)
+## Our code (Parts 2 and 3: image classification and image captioning)
 
 ### Setup
 
@@ -29,36 +29,51 @@ earlier ones):
 | Q2.3 | `python -m tasks.q2_3.study` | one-factor-at-a-time study (7 factors, 45 runs), per-class accuracy, confusion matrix | 1.5 h |
 | Q2.4 | `python -m tasks.q2_4.inductive_biases` | weight visualizations, shifted test images, pixel permutation, MLP confusion matrix | 5 min |
 | Q2.5 | `python -m tasks.q2_5.cnn` | CNN random search (16 configs), top-3 re-run, selected CNN, shift and permutation experiments, confusion matrices | 1.5–2 h |
+| Q3.1 | `python -m tasks.q3_1.text_stats` | tokenizer and vocabulary statistics, `<unk>` rate, caption lengths, padding check | 1 min |
+| Q3.2 | `python -m tasks.q3_2.captioner` | GRU captioner on the frozen CNN: decoder search (5 trials), selected captioner with 3 seeds, loss curves, example captions | 1.5 h |
+| Q3.3 | `python -m tasks.q3_3.encoders` | MLP vs CNN encoder, each frozen / fine-tuned / trained from scratch (3 seeds each) | 5 h |
+| Q3.3 | `python -m tasks.q3_3.class_mention` | class mention vs classification accuracy (linear probes), correlations, per-class plot | 5 min |
+| Q3.4 | `python -m tasks.q3_4.decoding` | greedy vs beam search (beam 1, 3, 5, 10; with and without length normalization) | 5 min |
 
-\* On an Apple M2 laptop (8 GB RAM); MLPs on the CPU, CNNs on the Apple GPU (MPS). With a CUDA
+\* On an Apple M2 laptop (8 GB RAM); MLPs on the CPU, CNNs and all captioners on the Apple GPU (MPS). With a CUDA
 GPU everything uses the GPU.
 
-- Every run is saved as JSON in `results/q2_x/<run>/seed<k>.json` (config, per-epoch history,
-  train/val/test accuracy, number of parameters). A script skips runs whose JSON already exists
+- Every run is saved as JSON in `results/qX_Y/<run>/seed<k>.json` (config, per-epoch history,
+  train/val/test accuracy, number of parameters; for captioners also losses, perplexities, caption
+  metrics and the generated validation/test captions). A script skips runs whose JSON already exists
   with the same config, so an interrupted script can simply be restarted.
-- Each script also writes a `results/q2_x/summary.json` and a log, and its figures to
-  `figures/q2_x/`.
-- Model checkpoints are written to `checkpoints/q2_x/` and are **not** part of the submission
+- Each script also writes a summary JSON and a log to `results/qX_Y/`, and its figures to
+  `figures/qX_Y/`.
+- Model checkpoints are written to `checkpoints/qX_Y/` and are **not** part of the submission
   (`.gitignore`); they are recreated by running the scripts in the order above.
 - Seeds 0, 1 and 2 are used everywhere; with `train.set_seed` the runs are deterministic, so
-  re-running a script reproduces the same numbers.
+  re-running a script reproduces the same numbers. Exception: captioners whose encoder is trained
+  jointly on the Apple GPU (Q3.3 fine-tuned / scratch) are not bit-reproducible there and can differ
+  slightly between re-runs.
 
 ### Layout
 
 | Path | Content |
 |---|---|
-| `models.py` | `MLP` (configurable depth, width, activation, dropout; no hidden layer = linear baseline) and `CNN` (VGG-style blocks of 3×3 conv, BatchNorm, ReLU, max pooling; global average pooling) |
+| `models.py` | `MLP` (configurable depth, width, activation, dropout; no hidden layer = linear baseline) and `CNN` (VGG-style blocks of 3×3 conv, BatchNorm, ReLU, max pooling; global average pooling), both with `features()` for the image vector; `Captioner` (encoder + GRU decoder, image vector as initial state and optionally at every step; greedy decoding and beam search) |
+| `text.py` | tokenizer (lowercase, words and punctuation as tokens) and `Vocabulary` (frequency threshold, `<pad>`, `<bos>`, `<eos>`, `<unk>`) |
+| `captioning.py` | Part 3 helpers: building a captioner from a config dict (encoder from Part 2, frozen or trained jointly), teacher-forcing loss with `ignore_index=<pad>`, perplexity, caption generation, caption metrics, `caption_run` (train and evaluate one config with one seed and save the result) |
 | `common.py` | shared helpers: building models/optimizers/schedulers from a config dict, data loaders with per-channel normalization, `run` (train one config with one seed and save the result), evaluation, image shifts and border controls, pixel permutation, confusion matrices, plots |
-| `tasks/q2_x/` | one folder per question with the scripts above |
-| `results/q2_x/` | all run results (JSON), summaries and logs |
-| `figures/q2_x/` | all figures used in the report |
+| `tasks/qX_Y/` | one folder per question with the scripts above |
+| `results/qX_Y/` | all run results (JSON), summaries and logs |
+| `figures/qX_Y/` | all figures used in the report |
 
 ### Changes to the skeleton code
 
 None: `load_data.py`, `data.py`, `train.py` and `metrics.py` are unchanged. Our code only imports
-them (`channel_stats`, `ImageDataset`, `train`, `set_seed`, `count_parameters`, `get_device`,
-`confusion_matrix`, `per_class_accuracy`, …). Choosing the Apple GPU (MPS) for CNNs is done in
-`common.run_device`, outside `train.py`. No `numpy` is used.
+them (`channel_stats`, `ImageDataset`, `image_datasets`, `caption_loaders`, `train`, `set_seed`,
+`count_parameters`, `get_device`, `confusion_matrix`, `per_class_accuracy`, `bleu4`,
+`class_mention_accuracy`, `distinct_ngrams`, …). Choosing the Apple GPU (MPS) for CNNs and
+captioners is done in `common.run_device` and `captioning.device_for_captioning`, outside
+`train.py`. The tokenizer, vocabulary, captioner, and greedy and beam search decoding are our own
+code (`text.py`, `models.py`, `captioning.py`). Our extended class synonym list for Q3.3 (b) is
+defined in `tasks/q3_3/class_mention.py`, not in `metrics.py`.
+No `numpy` is used.
 
 ## Provided skeleton code
 

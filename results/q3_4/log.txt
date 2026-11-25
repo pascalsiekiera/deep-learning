@@ -1,0 +1,121 @@
+[seed 0] beam1       validation BLEU-4 15.01 | len 10.87 | distinct 1/2 199/566 | mention 70.9% | log p -9.46 | = greedy 100.0% | 11s
+[seed 0] beam1       test       BLEU-4 14.95 | len 10.89 | distinct 1/2 195/559 | mention 69.2% | log p -9.31 | = greedy 100.0% | 2s
+[seed 0] beam3       validation BLEU-4 16.79 | len 10.37 | distinct 1/2 179/490 | mention 71.0% | log p -7.88 | = greedy 19.5% | 3s
+[seed 0] beam3       test       BLEU-4 16.20 | len 10.47 | distinct 1/2 167/447 | mention 70.1% | log p -7.87 | = greedy 22.1% | 4s
+[seed 0] beam3_norm  validation BLEU-4 16.79 | len 11.05 | distinct 1/2 180/487 | mention 71.6% | log p -8.16 | = greedy 18.8% | 4s
+[seed 0] beam3_norm  test       BLEU-4 16.08 | len 11.12 | distinct 1/2 172/472 | mention 70.4% | log p -8.14 | = greedy 20.2% | 3s
+[seed 0] beam5       validation BLEU-4 16.87 | len 10.24 | distinct 1/2 178/451 | mention 70.7% | log p -7.58 | = greedy 14.4% | 4s
+[seed 0] beam5       test       BLEU-4 16.62 | len 10.27 | distinct 1/2 164/426 | mention 70.1% | log p -7.60 | = greedy 16.4% | 4s
+[seed 0] beam5_norm  validation BLEU-4 16.72 | len 11.15 | distinct 1/2 184/478 | mention 70.8% | log p -7.92 | = greedy 12.8% | 3s
+[seed 0] beam5_norm  test       BLEU-4 16.06 | len 11.20 | distinct 1/2 170/444 | mention 70.2% | log p -7.96 | = greedy 14.9% | 3s
+[seed 0] beam10      validation BLEU-4 17.85 | len 10.01 | distinct 1/2 170/409 | mention 70.2% | log p -7.30 | = greedy 10.8% | 6s
+[seed 0] beam10      test       BLEU-4 16.62 | len 10.06 | distinct 1/2 163/396 | mention 69.8% | log p -7.34 | = greedy 11.6% | 5s
+[seed 0] beam10_norm validation BLEU-4 17.51 | len 11.14 | distinct 1/2 173/434 | mention 70.9% | log p -7.69 | = greedy 8.6% | 5s
+[seed 0] beam10_norm test       BLEU-4 16.69 | len 11.14 | distinct 1/2 169/421 | mention 70.0% | log p -7.70 | = greedy 10.2% | 6s
+[seed 1] beam1       validation BLEU-4 14.15 | len 10.88 | distinct 1/2 175/512 | mention 70.6% | log p -10.38 | = greedy 100.0% | 2s
+[seed 1] beam1       test       BLEU-4 13.37 | len 10.88 | distinct 1/2 186/526 | mention 68.5% | log p -10.39 | = greedy 100.0% | 2s
+[seed 1] beam3       validation BLEU-4 16.45 | len 10.38 | distinct 1/2 172/467 | mention 70.9% | log p -8.25 | = greedy 16.7% | 3s
+[seed 1] beam3       test       BLEU-4 15.24 | len 10.33 | distinct 1/2 178/474 | mention 68.9% | log p -8.27 | = greedy 16.5% | 2s
+[seed 1] beam3_norm  validation BLEU-4 16.27 | len 10.83 | distinct 1/2 178/486 | mention 71.0% | log p -8.44 | = greedy 13.3% | 2s
+[seed 1] beam3_norm  test       BLEU-4 15.25 | len 10.86 | distinct 1/2 188/496 | mention 68.9% | log p -8.49 | = greedy 14.6% | 2s
+[seed 1] beam5       validation BLEU-4 16.56 | len 10.18 | distinct 1/2 161/403 | mention 71.6% | log p -7.90 | = greedy 13.1% | 3s
+[seed 1] beam5       test       BLEU-4 15.82 | len 10.18 | distinct 1/2 163/409 | mention 69.4% | log p -7.86 | = greedy 12.1% | 3s
+[seed 1] beam5_norm  validation BLEU-4 16.10 | len 10.83 | distinct 1/2 164/436 | mention 72.1% | log p -8.16 | = greedy 10.0% | 3s
+[seed 1] beam5_norm  test       BLEU-4 15.49 | len 10.83 | distinct 1/2 172/432 | mention 68.8% | log p -8.13 | = greedy 10.5% | 3s
+[seed 1] beam10      validation BLEU-4 16.44 | len 10.05 | distinct 1/2 155/357 | mention 71.9% | log p -7.59 | = greedy 11.0% | 11s
+[seed 1] beam10      test       BLEU-4 16.36 | len 10.05 | distinct 1/2 152/360 | mention 68.9% | log p -7.57 | = greedy 10.1% | 8s
+[seed 1] beam10_norm validation BLEU-4 15.73 | len 10.84 | distinct 1/2 163/402 | mention 72.1% | log p -7.87 | = greedy 8.5% | 5s
+[seed 1] beam10_norm test       BLEU-4 15.79 | len 10.87 | distinct 1/2 161/394 | mention 69.3% | log p -7.88 | = greedy 8.5% | 5s
+[seed 2] beam1       validation BLEU-4 15.58 | len 11.09 | distinct 1/2 183/535 | mention 71.1% | log p -9.54 | = greedy 100.0% | 2s
+[seed 2] beam1       test       BLEU-4 13.74 | len 11.10 | distinct 1/2 181/516 | mention 68.0% | log p -9.44 | = greedy 100.0% | 2s
+[seed 2] beam3       validation BLEU-4 17.45 | len 10.57 | distinct 1/2 183/502 | mention 73.2% | log p -7.94 | = greedy 22.1% | 3s
+[seed 2] beam3       test       BLEU-4 14.93 | len 10.53 | distinct 1/2 175/490 | mention 68.6% | log p -7.86 | = greedy 21.7% | 3s
+[seed 2] beam3_norm  validation BLEU-4 16.87 | len 11.02 | distinct 1/2 185/525 | mention 72.7% | log p -8.13 | = greedy 20.7% | 3s
+[seed 2] beam3_norm  test       BLEU-4 14.74 | len 11.00 | distinct 1/2 173/500 | mention 68.7% | log p -8.07 | = greedy 20.3% | 3s
+[seed 2] beam5       validation BLEU-4 18.03 | len 10.43 | distinct 1/2 174/474 | mention 72.1% | log p -7.57 | = greedy 17.9% | 3s
+[seed 2] beam5       test       BLEU-4 16.38 | len 10.36 | distinct 1/2 169/453 | mention 68.9% | log p -7.53 | = greedy 17.3% | 3s
+[seed 2] beam5_norm  validation BLEU-4 17.61 | len 11.06 | distinct 1/2 186/510 | mention 71.4% | log p -7.81 | = greedy 15.2% | 3s
+[seed 2] beam5_norm  test       BLEU-4 15.85 | len 11.01 | distinct 1/2 179/492 | mention 68.7% | log p -7.78 | = greedy 14.8% | 3s
+[seed 2] beam10      validation BLEU-4 18.31 | len 10.25 | distinct 1/2 163/418 | mention 72.0% | log p -7.26 | = greedy 13.7% | 4s
+[seed 2] beam10      test       BLEU-4 17.39 | len 10.27 | distinct 1/2 154/392 | mention 69.1% | log p -7.23 | = greedy 13.6% | 5s
+[seed 2] beam10_norm validation BLEU-4 18.21 | len 11.03 | distinct 1/2 170/439 | mention 71.1% | log p -7.51 | = greedy 11.6% | 5s
+[seed 2] beam10_norm test       BLEU-4 16.25 | len 11.00 | distinct 1/2 159/409 | mention 69.0% | log p -7.48 | = greedy 12.1% | 5s
+
+== validation (mean ± std over seeds (0, 1, 2)) ==
+| setting | BLEU-4 | mean length | distinct words | distinct bigrams | class mention | mean log p | distinct captions | repeated bigram | = greedy | s |
+| beam1 | 14.91 ± 0.72 | 10.95 ± 0.13 | 186 ± 12 | 538 ± 27 | 70.9 ± 0.3 | -9.79 ± 0.51 | 419 ± 23 | 4.8 ± 1.7 | 100.0 ± 0.0 | 5 |
+| beam3 | 16.89 ± 0.51 | 10.44 ± 0.12 | 178 ± 6 | 486 ± 18 | 71.7 ± 1.3 | -8.02 ± 0.20 | 346 ± 24 | 3.0 ± 1.4 | 19.4 ± 2.7 | 3 |
+| beam3_norm | 16.64 ± 0.33 | 10.97 ± 0.12 | 181 ± 4 | 499 ± 22 | 71.8 ± 0.9 | -8.24 ± 0.17 | 371 ± 23 | 4.4 ± 2.5 | 17.6 ± 3.8 | 3 |
+| beam5 | 17.15 ± 0.78 | 10.28 ± 0.13 | 171 ± 9 | 443 ± 36 | 71.5 ± 0.7 | -7.68 ± 0.19 | 293 ± 20 | 2.5 ± 2.4 | 15.1 ± 2.5 | 3 |
+| beam5_norm | 16.81 ± 0.76 | 11.01 ± 0.16 | 178 ± 12 | 475 ± 37 | 71.4 ± 0.7 | -7.96 ± 0.18 | 326 ± 31 | 4.4 ± 3.3 | 12.7 ± 2.6 | 3 |
+| beam10 | 17.53 ± 0.97 | 10.10 ± 0.13 | 163 ± 8 | 395 ± 33 | 71.4 ± 1.0 | -7.38 ± 0.18 | 234 ± 30 | 2.3 ± 3.0 | 11.8 ± 1.6 | 7 |
+| beam10_norm | 17.15 ± 1.28 | 11.00 ± 0.16 | 169 ± 5 | 425 ± 20 | 71.4 ± 0.6 | -7.69 ± 0.18 | 259 ± 31 | 4.4 ± 4.7 | 9.6 ± 1.8 | 5 |
+
+== test (mean ± std over seeds (0, 1, 2)) ==
+| setting | BLEU-4 | mean length | distinct words | distinct bigrams | class mention | mean log p | distinct captions | repeated bigram | = greedy | s |
+| beam1 | 14.02 ± 0.83 | 10.96 ± 0.12 | 187 ± 7 | 534 ± 23 | 68.6 ± 0.6 | -9.71 ± 0.59 | 415 ± 21 | 4.9 ± 1.1 | 100.0 ± 0.0 | 2 |
+| beam3 | 15.46 ± 0.66 | 10.44 ± 0.10 | 173 ± 6 | 470 ± 22 | 69.2 ± 0.8 | -8.00 ± 0.23 | 343 ± 16 | 3.3 ± 1.9 | 20.1 ± 3.1 | 3 |
+| beam3_norm | 15.36 ± 0.68 | 10.99 ± 0.13 | 178 ± 9 | 489 ± 15 | 69.3 ± 0.9 | -8.23 ± 0.22 | 366 ± 23 | 4.6 ± 2.4 | 18.4 ± 3.3 | 3 |
+| beam5 | 16.27 ± 0.41 | 10.27 ± 0.09 | 165 ± 3 | 429 ± 22 | 69.5 ± 0.6 | -7.66 ± 0.17 | 287 ± 25 | 2.6 ± 2.0 | 15.3 ± 2.8 | 3 |
+| beam5_norm | 15.80 ± 0.29 | 11.01 ± 0.19 | 174 ± 5 | 456 ± 32 | 69.2 ± 0.8 | -7.96 ± 0.17 | 317 ± 38 | 4.5 ± 3.4 | 13.4 ± 2.5 | 3 |
+| beam10 | 16.79 ± 0.53 | 10.13 ± 0.12 | 156 ± 6 | 383 ± 20 | 69.3 ± 0.5 | -7.38 ± 0.17 | 228 ± 35 | 2.6 ± 3.2 | 11.8 ± 1.8 | 6 |
+| beam10_norm | 16.24 ± 0.45 | 11.00 ± 0.14 | 163 ± 5 | 408 ± 14 | 69.4 ± 0.5 | -7.69 ± 0.20 | 257 ± 30 | 4.8 ± 5.5 | 10.3 ± 1.8 | 5 |
+
+== examples (seed 0, test): 550 images with >= 3 different captions among beam1 / beam5 / beam5_norm / beam10 ==
+#1 (cat) ref: a close up of cat with its eyes partially closed
+    beam1       a cat is sleeping on a rug next to a keyboard .
+    beam3       a cat that is laying down on a rug .
+    beam5       a cat that is laying down on a rug .
+    beam5_norm  a cat that is laying down next to a stuffed animal .
+    beam10      a cat that is sitting on a rug .
+    beam10_norm a cat that is sitting on a rug .
+#2 (elephant) ref: A large elephant standing next to a metal fence.
+    beam1       a large elephant standing in the middle of a forest .
+    beam3       a large elephant standing next to a baby elephant .
+    beam5       a large elephant standing next to a baby elephant .
+    beam5_norm  a large elephant standing in the middle of a forest .
+    beam10      a couple of elephants standing next to each other .
+    beam10_norm a large elephant standing on top of a lush green field .
+#5 (elephant) ref: An adult elephant stands in front of a tree.
+    beam1       a large elephant standing in the grass near a fence .
+    beam3       an elephant standing in the grass near a fence .
+    beam5       a group of elephants standing in the grass .
+    beam5_norm  a large elephant standing in the grass near a fence .
+    beam10      a couple of elephants standing next to each other .
+    beam10_norm a couple of elephants standing next to each other .
+#8 (dog) ref: A dog sticking it's nose out of a crack in a window.
+    beam1       a cat sitting on a counter in front of a mirror .
+    beam3       a black and white cat sitting on top of a laptop .
+    beam5       a black and white cat sitting on top of a laptop .
+    beam5_norm  a black and white cat sitting on top of a bathroom sink .
+    beam10      a black and white cat sitting on a window sill .
+    beam10_norm a black and white cat sitting on top of a bathroom sink .
+#9 (airplane) ref: There is a military plane here at a airport
+    beam1       a large white airplane sitting on top of a runway .
+    beam3       a large air plane on a run way
+    beam5       a large air plane on a run way
+    beam5_norm  a large airplane sitting on top of an airport runway .
+    beam10      a large air plane on a run way
+    beam10_norm a large airplane sitting on top of an airport runway .
+#12 (motorcycle) ref: A man riding on the back of a motorcycle.
+    beam1       a man riding a motorcycle down a street next to a green tent .
+    beam3       a motorcycle parked on the side of a road .
+    beam5       a motorcycle parked on the side of a road .
+    beam5_norm  a motorcycle is parked on the side of the road .
+    beam10      a motorcycle parked on the side of a road .
+    beam10_norm a motorcycle is parked on the side of the road .
+#13 (truck) ref: A fire truck near a yellow fire hydrant.
+    beam1       a bus with a <unk> advertisement on the side of the road .
+    beam3       a red and white bus on a city street
+    beam5       a large white bus on a city street .
+    beam5_norm  a large white bus on a city street .
+    beam10      a red double decker bus driving down a street .
+    beam10_norm a bus is parked on the side of the street .
+#14 (airplane) ref: A red and yellow trimmed plane sitting on tarmac.
+    beam1       a large airplane flying through a cloudy sky .
+    beam3       a large passenger jet sitting on top of an airport runway .
+    beam5       a large passenger jet sitting on top of a runway .
+    beam5_norm  a large passenger jet sitting on top of a runway .
+    beam10      a large jetliner sitting on top of an airport runway .
+    beam10_norm a large jetliner sitting on top of an airport runway .
+saved /Users/psi/code/uni/deep-learning/figures/q3_4/tradeoffs.pdf

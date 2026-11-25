@@ -1,0 +1,1688 @@
+{
+ "model": "q3_2/final",
+ "max_len": 25,
+ "settings": [
+  [
+   1,
+   false
+  ],
+  [
+   3,
+   false
+  ],
+  [
+   3,
+   true
+  ],
+  [
+   5,
+   false
+  ],
+  [
+   5,
+   true
+  ],
+  [
+   10,
+   false
+  ],
+  [
+   10,
+   true
+  ]
+ ],
+ "summary": {
+  "beam1": {
+   "validation": {
+    "bleu4": {
+     "mean": 14.913880463391903,
+     "std": 0.7221814565134209,
+     "values": [
+      15.008590902366159,
+      14.149016703402417,
+      15.584033784407133
+     ]
+    },
+    "mean_length": {
+     "mean": 10.948333333333332,
+     "std": 0.12617580327992087,
+     "values": [
+      10.873,
+      10.878,
+      11.094
+     ]
+    },
+    "distinct_1": {
+     "mean": 185.66666666666666,
+     "std": 12.220201853215574,
+     "values": [
+      199,
+      175,
+      183
+     ]
+    },
+    "distinct_2": {
+     "mean": 537.6666666666666,
+     "std": 27.098585448936873,
+     "values": [
+      566,
+      512,
+      535
+     ]
+    },
+    "class_mention": {
+     "mean": 0.7086666666666667,
+     "std": 0.0025166114784235852,
+     "values": [
+      0.709,
+      0.706,
+      0.711
+     ]
+    },
+    "mean_logp": {
+     "mean": -9.793018232425053,
+     "std": 0.5090940773676674,
+     "values": [
+      -9.464113753795624,
+      -10.379422083377838,
+      -9.5355188601017
+     ]
+    },
+    "mean_logp_per_token": {
+     "mean": -0.8177170744861318,
+     "std": 0.047303573951466456,
+     "values": [
+      -0.7954320868377893,
+      -0.8720470966340769,
+      -0.785672039986529
+     ]
+    },
+    "distinct_captions": {
+     "mean": 418.6666666666667,
+     "std": 22.810816147900834,
+     "values": [
+      445,
+      405,
+      406
+     ]
+    },
+    "repeated_bigram": {
+     "mean": 0.04766666666666666,
+     "std": 0.01709775813764288,
+     "values": [
+      0.059,
+      0.056,
+      0.028
+     ]
+    },
+    "cut_at_max_len": {
+     "mean": 0.0003333333333333333,
+     "std": 0.0005773502691896258,
+     "values": [
+      0.0,
+      0.0,
+      0.001
+     ]
+    },
+    "same_as_greedy": {
+     "mean": 1.0,
+     "std": 0.0,
+     "values": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    },
+    "seconds": {
+     "mean": 5.141355991363525,
+     "std": 5.1957204150000385,
+     "values": [
+      11.140623092651367,
+      2.187617063522339,
+      2.09582781791687
+     ]
+    }
+   },
+   "test": {
+    "bleu4": {
+     "mean": 14.021132773415408,
+     "std": 0.828681681496545,
+     "values": [
+      14.954419060622136,
+      13.37160753984189,
+      13.7373717197822
+     ]
+    },
+    "mean_length": {
+     "mean": 10.955333333333334,
+     "std": 0.12095591483401501,
+     "values": [
+      10.886,
+      10.885,
+      11.095
+     ]
+    },
+    "distinct_1": {
+     "mean": 187.33333333333334,
+     "std": 7.094598884597588,
+     "values": [
+      195,
+      186,
+      181
+     ]
+    },
+    "distinct_2": {
+     "mean": 533.6666666666666,
+     "std": 22.501851775650227,
+     "values": [
+      559,
+      526,
+      516
+     ]
+    },
+    "class_mention": {
+     "mean": 0.6856666666666666,
+     "std": 0.006027713773341655,
+     "values": [
+      0.692,
+      0.685,
+      0.68
+     ]
+    },
+    "mean_logp": {
+     "mean": -9.70922502017021,
+     "std": 0.5903813463831602,
+     "values": [
+      -9.305143934726715,
+      -10.386753724098206,
+      -9.435777401685714
+     ]
+    },
+    "mean_logp_per_token": {
+     "mean": -0.810734276772798,
+     "std": 0.05335582559409841,
+     "values": [
+      -0.7820662205443181,
+      -0.8722959560978316,
+      -0.7778406536762442
+     ]
+    },
+    "distinct_captions": {
+     "mean": 415.3333333333333,
+     "std": 21.221058723196006,
+     "values": [
+      439,
+      398,
+      409
+     ]
+    },
+    "repeated_bigram": {
+     "mean": 0.048999999999999995,
+     "std": 0.011269427669584647,
+     "values": [
+      0.055,
+      0.056,
+      0.036
+     ]
+    },
+    "cut_at_max_len": {
+     "mean": 0.0,
+     "std": 0.0,
+     "values": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "same_as_greedy": {
+     "mean": 1.0,
+     "std": 0.0,
+     "values": [
+      1.0,
+      1.0,
+      1.0
+     ]
+    },
+    "seconds": {
+     "mean": 2.362722317377726,
+     "std": 0.1286663789941034,
+     "values": [
+      2.4385461807250977,
+      2.2141618728637695,
+      2.4354588985443115
+     ]
+    }
+   }
+  },
+  "beam3": {
+   "validation": {
+    "bleu4": {
+     "mean": 16.894706410618493,
+     "std": 0.508624799648002,
+     "values": [
+      16.78775252482529,
+      16.44806353132018,
+      17.448303175710006
+     ]
+    },
+    "mean_length": {
+     "mean": 10.438666666666665,
+     "std": 0.11730870953741403,
+     "values": [
+      10.366,
+      10.376,
+      10.574
+     ]
+    },
+    "distinct_1": {
+     "mean": 178.0,
+     "std": 5.5677643628300215,
+     "values": [
+      179,
+      172,
+      183
+     ]
+    },
+    "distinct_2": {
+     "mean": 486.3333333333333,
+     "std": 17.7857620959388,
+     "values": [
+      490,
+      467,
+      502
+     ]
+    },
+    "class_mention": {
+     "mean": 0.717,
+     "std": 0.013000000000000012,
+     "values": [
+      0.71,
+      0.709,
+      0.732
+     ]
+    },
+    "mean_logp": {
+     "mean": -8.02335697301229,
+     "std": 0.19660373630675188,
+     "values": [
+      -7.878119747638703,
+      -8.247080318927765,
+      -7.944870852470398
+     ]
+    },
+    "mean_logp_per_token": {
+     "mean": -0.7036667278056455,
+     "std": 0.020869197015088613,
+     "values": [
+      -0.695726679541569,
+      -0.7273405614482248,
+      -0.6879329424271429
+     ]
+    },
+    "distinct_captions": {
+     "mean": 345.6666666666667,
+     "std": 23.86070689089771,
+     "values": [
+      373,
+      329,
+      335
+     ]
+    },
+    "repeated_bigram": {
+     "mean": 0.029666666666666664,
+     "std": 0.014153915830374763,
+     "values": [
+      0.021,
+      0.046,
+      0.022
+     ]
+    },
+    "cut_at_max_len": {
+     "mean": 0.0,
+     "std": 0.0,
+     "values": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "same_as_greedy": {
+     "mean": 0.19433333333333333,
+     "std": 0.02700617213403879,
+     "values": [
+      0.195,
+      0.167,
+      0.221
+     ]
+    },
+    "seconds": {
+     "mean": 2.728181997934977,
+     "std": 0.3022164697085295,
+     "values": [
+      3.0769598484039307,
+      2.5437779426574707,
+      2.5638082027435303
+     ]
+    }
+   },
+   "test": {
+    "bleu4": {
+     "mean": 15.456968628394565,
+     "std": 0.6642911070338178,
+     "values": [
+      16.202684268027607,
+      15.239718692341139,
+      14.928502924814952
+     ]
+    },
+    "mean_length": {
+     "mean": 10.443666666666667,
+     "std": 0.1020212396186856,
+     "values": [
+      10.467,
+      10.332,
+      10.532
+     ]
+    },
+    "distinct_1": {
+     "mean": 173.33333333333334,
+     "std": 5.686240703077327,
+     "values": [
+      167,
+      178,
+      175
+     ]
+    },
+    "distinct_2": {
+     "mean": 470.3333333333333,
+     "std": 21.73323108360405,
+     "values": [
+      447,
+      474,
+      490
+     ]
+    },
+    "class_mention": {
+     "mean": 0.6920000000000001,
+     "std": 0.007937253933193738,
+     "values": [
+      0.701,
+      0.689,
+      0.686
+     ]
+    },
+    "mean_logp": {
+     "mean": -8.001693659146627,
+     "std": 0.2315118469053685,
+     "values": [
+      -7.8718585710525515,
+      -8.268984305858613,
+      -7.864238100528717
+     ]
+    },
+    "mean_logp_per_token": {
+     "mean": -0.7018701633979361,
+     "std": 0.026770031765496777,
+     "values": [
+      -0.6889574353609108,
+      -0.7326489592789717,
+      -0.6840040955539257
+     ]
+    },
+    "distinct_captions": {
+     "mean": 342.6666666666667,
+     "std": 16.010413278030438,
+     "values": [
+      359,
+      327,
+      342
+     ]
+    },
+    "repeated_bigram": {
+     "mean": 0.03266666666666667,
+     "std": 0.018502252115170557,
+     "values": [
+      0.023,
+      0.054,
+      0.021
+     ]
+    },
+    "cut_at_max_len": {
+     "mean": 0.0,
+     "std": 0.0,
+     "values": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "same_as_greedy": {
+     "mean": 0.20099999999999998,
+     "std": 0.03124099870362661,
+     "values": [
+      0.221,
+      0.165,
+      0.217
+     ]
+    },
+    "seconds": {
+     "mean": 2.844204902648926,
+     "std": 0.6555599422429053,
+     "values": [
+      3.5520408153533936,
+      2.2579400539398193,
+      2.7226338386535645
+     ]
+    }
+   }
+  },
+  "beam3_norm": {
+   "validation": {
+    "bleu4": {
+     "mean": 16.640812395406524,
+     "std": 0.326950929692243,
+     "values": [
+      16.788586203221527,
+      16.266061590840415,
+      16.867789392157633
+     ]
+    },
+    "mean_length": {
+     "mean": 10.967999999999998,
+     "std": 0.12007914056987615,
+     "values": [
+      11.055,
+      10.831,
+      11.018
+     ]
+    },
+    "distinct_1": {
+     "mean": 181.0,
+     "std": 3.605551275463989,
+     "values": [
+      180,
+      178,
+      185
+     ]
+    },
+    "distinct_2": {
+     "mean": 499.3333333333333,
+     "std": 22.233608194203057,
+     "values": [
+      487,
+      486,
+      525
+     ]
+    },
+    "class_mention": {
+     "mean": 0.7176666666666667,
+     "std": 0.008621678104251716,
+     "values": [
+      0.716,
+      0.71,
+      0.727
+     ]
+    },
+    "mean_logp": {
+     "mean": -8.241291224161785,
+     "std": 0.17091244846082274,
+     "values": [
+      -8.15822960472107,
+      -8.43785957956314,
+      -8.127784488201142
+     ]
+    },
+    "mean_logp_per_token": {
+     "mean": -0.6882658702187535,
+     "std": 0.021248355329026716,
+     "values": [
+      -0.6769705635413225,
+      -0.7127763080678658,
+      -0.6750507390470724
+     ]
+    },
+    "distinct_captions": {
+     "mean": 371.0,
+     "std": 22.516660498395403,
+     "values": [
+      394,
+      349,
+      370
+     ]
+    },
+    "repeated_bigram": {
+     "mean": 0.044000000000000004,
+     "std": 0.02457641145488901,
+     "values": [
+      0.034,
+      0.072,
+      0.026
+     ]
+    },
+    "cut_at_max_len": {
+     "mean": 0.0,
+     "std": 0.0,
+     "values": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "same_as_greedy": {
+     "mean": 0.17600000000000002,
+     "std": 0.03843175770115126,
+     "values": [
+      0.188,
+      0.133,
+      0.207
+     ]
+    },
+    "seconds": {
+     "mean": 3.0267275174458823,
+     "std": 1.058674230015648,
+     "values": [
+      4.151098966598511,
+      2.049050807952881,
+      2.880032777786255
+     ]
+    }
+   },
+   "test": {
+    "bleu4": {
+     "mean": 15.357126063371558,
+     "std": 0.6785027791793309,
+     "values": [
+      16.08379414850665,
+      15.247427865843012,
+      14.74015617576501
+     ]
+    },
+    "mean_length": {
+     "mean": 10.995,
+     "std": 0.13118307817702732,
+     "values": [
+      11.122,
+      10.86,
+      11.003
+     ]
+    },
+    "distinct_1": {
+     "mean": 177.66666666666666,
+     "std": 8.962886439832502,
+     "values": [
+      172,
+      188,
+      173
+     ]
+    },
+    "distinct_2": {
+     "mean": 489.3333333333333,
+     "std": 15.14375558880073,
+     "values": [
+      472,
+      496,
+      500
+     ]
+    },
+    "class_mention": {
+     "mean": 0.6933333333333334,
+     "std": 0.00929157324317754,
+     "values": [
+      0.704,
+      0.689,
+      0.687
+     ]
+    },
+    "mean_logp": {
+     "mean": -8.233139811515807,
+     "std": 0.2221080654538585,
+     "values": [
+      -8.138375902175904,
+      -8.486911794662475,
+      -8.074131737709045
+     ]
+    },
+    "mean_logp_per_token": {
+     "mean": -0.6859762461123303,
+     "std": 0.025333097132331818,
+     "values": [
+      -0.6717626104344633,
+      -0.7152245460816183,
+      -0.6709415818209093
+     ]
+    },
+    "distinct_captions": {
+     "mean": 366.0,
+     "std": 22.64950330581225,
+     "values": [
+      390,
+      345,
+      363
+     ]
+    },
+    "repeated_bigram": {
+     "mean": 0.04566666666666666,
+     "std": 0.02371356854910988,
+     "values": [
+      0.039,
+      0.072,
+      0.026
+     ]
+    },
+    "cut_at_max_len": {
+     "mean": 0.0,
+     "std": 0.0,
+     "values": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "same_as_greedy": {
+     "mean": 0.18366666666666664,
+     "std": 0.032624121954978866,
+     "values": [
+      0.202,
+      0.146,
+      0.203
+     ]
+    },
+    "seconds": {
+     "mean": 2.74855899810791,
+     "std": 0.6118492398838133,
+     "values": [
+      3.393311023712158,
+      2.1760218143463135,
+      2.676344156265259
+     ]
+    }
+   }
+  },
+  "beam5": {
+   "validation": {
+    "bleu4": {
+     "mean": 17.152172928839025,
+     "std": 0.7773981104825871,
+     "values": [
+      16.869422953944145,
+      16.55572194699926,
+      18.03137388557367
+     ]
+    },
+    "mean_length": {
+     "mean": 10.281,
+     "std": 0.12996538000559962,
+     "values": [
+      10.242,
+      10.175,
+      10.426
+     ]
+    },
+    "distinct_1": {
+     "mean": 171.0,
+     "std": 8.888194417315589,
+     "values": [
+      178,
+      161,
+      174
+     ]
+    },
+    "distinct_2": {
+     "mean": 442.6666666666667,
+     "std": 36.22614157391501,
+     "values": [
+      451,
+      403,
+      474
+     ]
+    },
+    "class_mention": {
+     "mean": 0.7146666666666667,
+     "std": 0.007094598884597594,
+     "values": [
+      0.707,
+      0.716,
+      0.721
+     ]
+    },
+    "mean_logp": {
+     "mean": -7.682352637132008,
+     "std": 0.18819173571728057,
+     "values": [
+      -7.57766661119461,
+      -7.89961004114151,
+      -7.569781259059906
+     ]
+    },
+    "mean_logp_per_token": {
+     "mean": -0.683190645461584,
+     "std": 0.023514755900734863,
+     "values": [
+      -0.6760483928640988,
+      -0.7094484400028526,
+      -0.6640751035178009
+     ]
+    },
+    "distinct_captions": {
+     "mean": 293.0,
+     "std": 19.974984355438178,
+     "values": [
+      315,
+      276,
+      288
+     ]
+    },
+    "repeated_bigram": {
+     "mean": 0.025333333333333336,
+     "std": 0.02362907813126304,
+     "values": [
+      0.017,
+      0.052,
+      0.007
+     ]
+    },
+    "cut_at_max_len": {
+     "mean": 0.0,
+     "std": 0.0,
+     "values": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "same_as_greedy": {
+     "mean": 0.15133333333333335,
+     "std": 0.024826061575153904,
+     "values": [
+      0.144,
+      0.131,
+      0.179
+     ]
+    },
+    "seconds": {
+     "mean": 3.308024009068807,
+     "std": 0.6549861912112066,
+     "values": [
+      3.99265193939209,
+      2.687375068664551,
+      3.2440450191497803
+     ]
+    }
+   },
+   "test": {
+    "bleu4": {
+     "mean": 16.27249156310312,
+     "std": 0.41107088863394325,
+     "values": [
+      16.617774182279927,
+      15.817778967927007,
+      16.38192153910242
+     ]
+    },
+    "mean_length": {
+     "mean": 10.267666666666667,
+     "std": 0.09100732571245772,
+     "values": [
+      10.269,
+      10.176,
+      10.358
+     ]
+    },
+    "distinct_1": {
+     "mean": 165.33333333333334,
+     "std": 3.2145502536643185,
+     "values": [
+      164,
+      163,
+      169
+     ]
+    },
+    "distinct_2": {
+     "mean": 429.3333333333333,
+     "std": 22.18858565419016,
+     "values": [
+      426,
+      409,
+      453
+     ]
+    },
+    "class_mention": {
+     "mean": 0.6946666666666667,
+     "std": 0.006027713773341713,
+     "values": [
+      0.701,
+      0.694,
+      0.689
+     ]
+    },
+    "mean_logp": {
+     "mean": -7.663457391579946,
+     "std": 0.1741551493389944,
+     "values": [
+      -7.602777193546295,
+      -7.8598349900245665,
+      -7.527759991168976
+     ]
+    },
+    "mean_logp_per_token": {
+     "mean": -0.6826939481718535,
+     "std": 0.02108983799854443,
+     "values": [
+      -0.6766760722129905,
+      -0.7061386426460334,
+      -0.6652671296565366
+     ]
+    },
+    "distinct_captions": {
+     "mean": 286.6666666666667,
+     "std": 24.5017006212494,
+     "values": [
+      311,
+      262,
+      287
+     ]
+    },
+    "repeated_bigram": {
+     "mean": 0.02566666666666667,
+     "std": 0.019553345834749953,
+     "values": [
+      0.024,
+      0.046,
+      0.007
+     ]
+    },
+    "cut_at_max_len": {
+     "mean": 0.0,
+     "std": 0.0,
+     "values": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "same_as_greedy": {
+     "mean": 0.15266666666666667,
+     "std": 0.027790885796126277,
+     "values": [
+      0.164,
+      0.121,
+      0.173
+     ]
+    },
+    "seconds": {
+     "mean": 3.2569328943888345,
+     "std": 0.3228592596020414,
+     "values": [
+      3.580004930496216,
+      3.25650691986084,
+      2.9342868328094482
+     ]
+    }
+   }
+  },
+  "beam5_norm": {
+   "validation": {
+    "bleu4": {
+     "mean": 16.811640292904983,
+     "std": 0.7573703149712728,
+     "values": [
+      16.719977881299062,
+      16.10427278938641,
+      17.61067020802948
+     ]
+    },
+    "mean_length": {
+     "mean": 11.011666666666668,
+     "std": 0.16490098038924297,
+     "values": [
+      11.147,
+      10.828,
+      11.06
+     ]
+    },
+    "distinct_1": {
+     "mean": 178.0,
+     "std": 12.165525060596439,
+     "values": [
+      184,
+      164,
+      186
+     ]
+    },
+    "distinct_2": {
+     "mean": 474.6666666666667,
+     "std": 37.112441759244746,
+     "values": [
+      478,
+      436,
+      510
+     ]
+    },
+    "class_mention": {
+     "mean": 0.7143333333333333,
+     "std": 0.006506407098647718,
+     "values": [
+      0.708,
+      0.721,
+      0.714
+     ]
+    },
+    "mean_logp": {
+     "mean": -7.963635019143422,
+     "std": 0.17999380465775316,
+     "values": [
+      -7.921434634208679,
+      -8.160979687690736,
+      -7.808490735530853
+     ]
+    },
+    "mean_logp_per_token": {
+     "mean": -0.6616174486013632,
+     "std": 0.02361722491001802,
+     "values": [
+      -0.6512655332257034,
+      -0.6886429302769544,
+      -0.6449438823014317
+     ]
+    },
+    "distinct_captions": {
+     "mean": 326.0,
+     "std": 30.610455730027933,
+     "values": [
+      358,
+      297,
+      323
+     ]
+    },
+    "repeated_bigram": {
+     "mean": 0.043666666666666666,
+     "std": 0.033246553706111154,
+     "values": [
+      0.039,
+      0.079,
+      0.013
+     ]
+    },
+    "cut_at_max_len": {
+     "mean": 0.0,
+     "std": 0.0,
+     "values": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "same_as_greedy": {
+     "mean": 0.12666666666666668,
+     "std": 0.02602562839459084,
+     "values": [
+      0.128,
+      0.1,
+      0.152
+     ]
+    },
+    "seconds": {
+     "mean": 3.1486546198527017,
+     "std": 0.17708213940959483,
+     "values": [
+      3.0974929332733154,
+      3.3456850051879883,
+      3.0027859210968018
+     ]
+    }
+   },
+   "test": {
+    "bleu4": {
+     "mean": 15.798234792711279,
+     "std": 0.2885440649106447,
+     "values": [
+      16.05719515055329,
+      15.487199313138072,
+      15.850309914442478
+     ]
+    },
+    "mean_length": {
+     "mean": 11.012,
+     "std": 0.18550202155232637,
+     "values": [
+      11.197,
+      10.826,
+      11.013
+     ]
+    },
+    "distinct_1": {
+     "mean": 173.66666666666666,
+     "std": 4.725815626252608,
+     "values": [
+      170,
+      172,
+      179
+     ]
+    },
+    "distinct_2": {
+     "mean": 456.0,
+     "std": 31.74901573277509,
+     "values": [
+      444,
+      432,
+      492
+     ]
+    },
+    "class_mention": {
+     "mean": 0.6923333333333334,
+     "std": 0.008386497083606056,
+     "values": [
+      0.702,
+      0.688,
+      0.687
+     ]
+    },
+    "mean_logp": {
+     "mean": -7.955384206453959,
+     "std": 0.1717609650063725,
+     "values": [
+      -7.95955937242508,
+      -8.125019525527954,
+      -7.781573721408844
+     ]
+    },
+    "mean_logp_per_token": {
+     "mean": -0.6609069677009756,
+     "std": 0.021558697398303933,
+     "values": [
+      -0.6518791344868309,
+      -0.6855119545658721,
+      -0.6453298140502238
+     ]
+    },
+    "distinct_captions": {
+     "mean": 317.3333333333333,
+     "std": 38.00438571182717,
+     "values": [
+      355,
+      279,
+      318
+     ]
+    },
+    "repeated_bigram": {
+     "mean": 0.04466666666666667,
+     "std": 0.034486712417006835,
+     "values": [
+      0.038,
+      0.082,
+      0.014
+     ]
+    },
+    "cut_at_max_len": {
+     "mean": 0.0,
+     "std": 0.0,
+     "values": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "same_as_greedy": {
+     "mean": 0.134,
+     "std": 0.02511971337416094,
+     "values": [
+      0.149,
+      0.105,
+      0.148
+     ]
+    },
+    "seconds": {
+     "mean": 3.112017552057902,
+     "std": 0.19830021882786872,
+     "values": [
+      3.2446799278259277,
+      2.884058713912964,
+      3.2073140144348145
+     ]
+    }
+   }
+  },
+  "beam10": {
+   "validation": {
+    "bleu4": {
+     "mean": 17.53252858581071,
+     "std": 0.9727752590634479,
+     "values": [
+      17.852212043114054,
+      16.440140037963943,
+      18.30523367635414
+     ]
+    },
+    "mean_length": {
+     "mean": 10.104000000000001,
+     "std": 0.12757350822173089,
+     "values": [
+      10.009,
+      10.054,
+      10.249
+     ]
+    },
+    "distinct_1": {
+     "mean": 162.66666666666666,
+     "std": 7.505553499465135,
+     "values": [
+      170,
+      155,
+      163
+     ]
+    },
+    "distinct_2": {
+     "mean": 394.6666666666667,
+     "std": 32.929217016706204,
+     "values": [
+      409,
+      357,
+      418
+     ]
+    },
+    "class_mention": {
+     "mean": 0.7136666666666667,
+     "std": 0.010115993936995688,
+     "values": [
+      0.702,
+      0.719,
+      0.72
+     ]
+    },
+    "mean_logp": {
+     "mean": -7.382451631546021,
+     "std": 0.1802930230577659,
+     "values": [
+      -7.302970278263092,
+      -7.5888284687995915,
+      -7.255556147575378
+     ]
+    },
+    "mean_logp_per_token": {
+     "mean": -0.6675140769769362,
+     "std": 0.021216080295549857,
+     "values": [
+      -0.6659263396047173,
+      -0.6894794212997336,
+      -0.6471364700263581
+     ]
+    },
+    "distinct_captions": {
+     "mean": 234.33333333333334,
+     "std": 29.535289626704753,
+     "values": [
+      263,
+      204,
+      236
+     ]
+    },
+    "repeated_bigram": {
+     "mean": 0.02266666666666667,
+     "std": 0.02977135088190211,
+     "values": [
+      0.007,
+      0.057,
+      0.004
+     ]
+    },
+    "cut_at_max_len": {
+     "mean": 0.0,
+     "std": 0.0,
+     "values": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "same_as_greedy": {
+     "mean": 0.11833333333333333,
+     "std": 0.016196707484341797,
+     "values": [
+      0.108,
+      0.11,
+      0.137
+     ]
+    },
+    "seconds": {
+     "mean": 7.1982630888621015,
+     "std": 3.764127786354203,
+     "values": [
+      5.609431028366089,
+      11.496301174163818,
+      4.4890570640563965
+     ]
+    }
+   },
+   "test": {
+    "bleu4": {
+     "mean": 16.789735275550715,
+     "std": 0.5325982745600985,
+     "values": [
+      16.620098541475308,
+      16.362617654496585,
+      17.38648963068026
+     ]
+    },
+    "mean_length": {
+     "mean": 10.125333333333332,
+     "std": 0.12208330489191899,
+     "values": [
+      10.063,
+      10.047,
+      10.266
+     ]
+    },
+    "distinct_1": {
+     "mean": 156.33333333333334,
+     "std": 5.859465277082315,
+     "values": [
+      163,
+      152,
+      154
+     ]
+    },
+    "distinct_2": {
+     "mean": 382.6666666666667,
+     "std": 19.73153144926499,
+     "values": [
+      396,
+      360,
+      392
+     ]
+    },
+    "class_mention": {
+     "mean": 0.6926666666666667,
+     "std": 0.004725815626252613,
+     "values": [
+      0.698,
+      0.689,
+      0.691
+     ]
+    },
+    "mean_logp": {
+     "mean": -7.377295352300009,
+     "std": 0.17353964314959652,
+     "values": [
+      -7.338233080863953,
+      -7.5670369811058045,
+      -7.226615994930268
+     ]
+    },
+    "mean_logp_per_token": {
+     "mean": -0.6659966780822589,
+     "std": 0.02238719330571833,
+     "values": [
+      -0.6655932443933119,
+      -0.6885828617520015,
+      -0.6438139281014635
+     ]
+    },
+    "distinct_captions": {
+     "mean": 227.66666666666666,
+     "std": 35.11884584284247,
+     "values": [
+      261,
+      191,
+      231
+     ]
+    },
+    "repeated_bigram": {
+     "mean": 0.025666666666666667,
+     "std": 0.03239341496868358,
+     "values": [
+      0.009,
+      0.063,
+      0.005
+     ]
+    },
+    "cut_at_max_len": {
+     "mean": 0.0,
+     "std": 0.0,
+     "values": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "same_as_greedy": {
+     "mean": 0.11766666666666668,
+     "std": 0.017559422921421233,
+     "values": [
+      0.116,
+      0.101,
+      0.136
+     ]
+    },
+    "seconds": {
+     "mean": 5.915129025777181,
+     "std": 1.5782361177026905,
+     "values": [
+      5.116913080215454,
+      7.733027935028076,
+      4.895446062088013
+     ]
+    }
+   }
+  },
+  "beam10_norm": {
+   "validation": {
+    "bleu4": {
+     "mean": 17.151380138706347,
+     "std": 1.2767611644689516,
+     "values": [
+      17.512445963177072,
+      15.732968931203004,
+      18.208725521738973
+     ]
+    },
+    "mean_length": {
+     "mean": 11.004,
+     "std": 0.1558974021592405,
+     "values": [
+      11.144,
+      10.836,
+      11.032
+     ]
+    },
+    "distinct_1": {
+     "mean": 168.66666666666666,
+     "std": 5.131601439446884,
+     "values": [
+      173,
+      163,
+      170
+     ]
+    },
+    "distinct_2": {
+     "mean": 425.0,
+     "std": 20.074859899884732,
+     "values": [
+      434,
+      402,
+      439
+     ]
+    },
+    "class_mention": {
+     "mean": 0.7136666666666667,
+     "std": 0.006429100507328643,
+     "values": [
+      0.709,
+      0.721,
+      0.711
+     ]
+    },
+    "mean_logp": {
+     "mean": -7.692257672945658,
+     "std": 0.1797407567331332,
+     "values": [
+      -7.693715621948242,
+      -7.871265020370483,
+      -7.511792376518249
+     ]
+    },
+    "mean_logp_per_token": {
+     "mean": -0.6388760616678497,
+     "std": 0.021106615596448903,
+     "values": [
+      -0.6326096753566733,
+      -0.66240627725039,
+      -0.6216122323964859
+     ]
+    },
+    "distinct_captions": {
+     "mean": 258.6666666666667,
+     "std": 31.214312956291916,
+     "values": [
+      293,
+      232,
+      251
+     ]
+    },
+    "repeated_bigram": {
+     "mean": 0.044333333333333336,
+     "std": 0.04680099714037441,
+     "values": [
+      0.023,
+      0.098,
+      0.012
+     ]
+    },
+    "cut_at_max_len": {
+     "mean": 0.0,
+     "std": 0.0,
+     "values": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "same_as_greedy": {
+     "mean": 0.09566666666666666,
+     "std": 0.017616280348965088,
+     "values": [
+      0.086,
+      0.085,
+      0.116
+     ]
+    },
+    "seconds": {
+     "mean": 4.927606582641602,
+     "std": 0.3063331416885936,
+     "values": [
+      5.257668733596802,
+      4.87273097038269,
+      4.6524200439453125
+     ]
+    }
+   },
+   "test": {
+    "bleu4": {
+     "mean": 16.24025501681608,
+     "std": 0.4492090341866646,
+     "values": [
+      16.68508332599351,
+      15.78678981178466,
+      16.248891912670064
+     ]
+    },
+    "mean_length": {
+     "mean": 11.003,
+     "std": 0.13750272724568066,
+     "values": [
+      11.14,
+      10.865,
+      11.004
+     ]
+    },
+    "distinct_1": {
+     "mean": 163.0,
+     "std": 5.291502622129181,
+     "values": [
+      169,
+      161,
+      159
+     ]
+    },
+    "distinct_2": {
+     "mean": 408.0,
+     "std": 13.527749258468683,
+     "values": [
+      421,
+      394,
+      409
+     ]
+    },
+    "class_mention": {
+     "mean": 0.6943333333333332,
+     "std": 0.005131601439446889,
+     "values": [
+      0.7,
+      0.693,
+      0.69
+     ]
+    },
+    "mean_logp": {
+     "mean": -7.686229345957439,
+     "std": 0.20271964764634162,
+     "values": [
+      -7.699442455291748,
+      -7.882019223690033,
+      -7.477226358890533
+     ]
+    },
+    "mean_logp_per_token": {
+     "mean": -0.6383403964709004,
+     "std": 0.02126843917295885,
+     "values": [
+      -0.6333433954442982,
+      -0.6616624171095057,
+      -0.6200153768588971
+     ]
+    },
+    "distinct_captions": {
+     "mean": 257.3333333333333,
+     "std": 29.871948937646057,
+     "values": [
+      291,
+      234,
+      247
+     ]
+    },
+    "repeated_bigram": {
+     "mean": 0.04800000000000001,
+     "std": 0.054744862772683985,
+     "values": [
+      0.021,
+      0.111,
+      0.012
+     ]
+    },
+    "cut_at_max_len": {
+     "mean": 0.0,
+     "std": 0.0,
+     "values": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "same_as_greedy": {
+     "mean": 0.10266666666666667,
+     "std": 0.018009256878986794,
+     "values": [
+      0.102,
+      0.085,
+      0.121
+     ]
+    },
+    "seconds": {
+     "mean": 5.307234287261963,
+     "std": 0.6312157423733643,
+     "values": [
+      5.969336032867432,
+      5.240094900131226,
+      4.7122719287872314
+     ]
+    }
+   }
+  }
+ },
+ "examples": [
+  {
+   "index": 1,
+   "class": "cat",
+   "reference": "a close up of cat with its eyes partially closed",
+   "beam1": "a cat is sleeping on a rug next to a keyboard .",
+   "beam3": "a cat that is laying down on a rug .",
+   "beam3_norm": "a cat that is laying down on a rug .",
+   "beam5": "a cat that is laying down on a rug .",
+   "beam5_norm": "a cat that is laying down next to a stuffed animal .",
+   "beam10": "a cat that is sitting on a rug .",
+   "beam10_norm": "a cat that is sitting on a rug ."
+  },
+  {
+   "index": 2,
+   "class": "elephant",
+   "reference": "A large elephant standing next to a metal fence.",
+   "beam1": "a large elephant standing in the middle of a forest .",
+   "beam3": "a large elephant standing next to a baby elephant .",
+   "beam3_norm": "a large elephant standing in the middle of a forest .",
+   "beam5": "a large elephant standing next to a baby elephant .",
+   "beam5_norm": "a large elephant standing in the middle of a forest .",
+   "beam10": "a couple of elephants standing next to each other .",
+   "beam10_norm": "a large elephant standing on top of a lush green field ."
+  },
+  {
+   "index": 5,
+   "class": "elephant",
+   "reference": "An adult elephant stands in front of a tree.",
+   "beam1": "a large elephant standing in the grass near a fence .",
+   "beam3": "an elephant standing in the grass near a fence .",
+   "beam3_norm": "a large elephant standing in the grass near a fence .",
+   "beam5": "a group of elephants standing in the grass .",
+   "beam5_norm": "a large elephant standing in the grass near a fence .",
+   "beam10": "a couple of elephants standing next to each other .",
+   "beam10_norm": "a couple of elephants standing next to each other ."
+  },
+  {
+   "index": 8,
+   "class": "dog",
+   "reference": "A dog sticking it's nose out of a crack in a window.",
+   "beam1": "a cat sitting on a counter in front of a mirror .",
+   "beam3": "a black and white cat sitting on top of a laptop .",
+   "beam3_norm": "a black and white cat sitting on top of a laptop .",
+   "beam5": "a black and white cat sitting on top of a laptop .",
+   "beam5_norm": "a black and white cat sitting on top of a bathroom sink .",
+   "beam10": "a black and white cat sitting on a window sill .",
+   "beam10_norm": "a black and white cat sitting on top of a bathroom sink ."
+  },
+  {
+   "index": 9,
+   "class": "airplane",
+   "reference": "There is a military plane here at a airport",
+   "beam1": "a large white airplane sitting on top of a runway .",
+   "beam3": "a large air plane on a run way",
+   "beam3_norm": "a large airplane sitting on top of a runway .",
+   "beam5": "a large air plane on a run way",
+   "beam5_norm": "a large airplane sitting on top of an airport runway .",
+   "beam10": "a large air plane on a run way",
+   "beam10_norm": "a large airplane sitting on top of an airport runway ."
+  },
+  {
+   "index": 12,
+   "class": "motorcycle",
+   "reference": "A man riding on the back of a motorcycle.",
+   "beam1": "a man riding a motorcycle down a street next to a green tent .",
+   "beam3": "a motorcycle parked on the side of a road .",
+   "beam3_norm": "a motorcycle is parked on the side of the road .",
+   "beam5": "a motorcycle parked on the side of a road .",
+   "beam5_norm": "a motorcycle is parked on the side of the road .",
+   "beam10": "a motorcycle parked on the side of a road .",
+   "beam10_norm": "a motorcycle is parked on the side of the road ."
+  },
+  {
+   "index": 13,
+   "class": "truck",
+   "reference": "A fire truck near a yellow fire hydrant.",
+   "beam1": "a bus with a <unk> advertisement on the side of the road .",
+   "beam3": "a red and white bus on a city street",
+   "beam3_norm": "a red and white bus is parked on the street .",
+   "beam5": "a large white bus on a city street .",
+   "beam5_norm": "a large white bus on a city street .",
+   "beam10": "a red double decker bus driving down a street .",
+   "beam10_norm": "a bus is parked on the side of the street ."
+  },
+  {
+   "index": 14,
+   "class": "airplane",
+   "reference": "A red and yellow trimmed plane sitting on tarmac.",
+   "beam1": "a large airplane flying through a cloudy sky .",
+   "beam3": "a large passenger jet sitting on top of an airport runway .",
+   "beam3_norm": "a large passenger jet sitting on top of an airport runway .",
+   "beam5": "a large passenger jet sitting on top of a runway .",
+   "beam5_norm": "a large passenger jet sitting on top of a runway .",
+   "beam10": "a large jetliner sitting on top of an airport runway .",
+   "beam10_norm": "a large jetliner sitting on top of an airport runway ."
+  }
+ ]
+}

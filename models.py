@@ -185,3 +185,69 @@ class Captioner(nn.Module):
             if done.all():
                 break
         return torch.stack(result, dim=1)
+
+    @torch.no_grad()
+    def beam_search(self, images, beam_size=3, length_norm=False, max_len=25):
+        """Beam search. Every image keeps `beam_size` unfinished hypotheses, ranked by their
+        log-probability. A hypothesis that ends with <eos> moves to the image's list of finished
+        captions, and the next-best extension takes its place in the beam. An image is done once
+        it has `beam_size` finished captions. Hypotheses that are still open after max_len tokens
+        are also added as candidates. Among the finished captions the result is the one with the
+        highest log p(y | x), or with length_norm, log p(y | x) / L (L = number of tokens incl.
+        <eos>). beam_size=1 without length_norm is greedy decoding.
+
+        Returns token ids (B, T) padded with <pad> (like `greedy`) and log p(y | x) (B,) of the
+        returned captions."""
+        h, img = self.encode(images)
+        B, K, device = images.shape[0], beam_size, images.device
+        h = h.repeat_interleave(K, dim=1)                          # (1, B*K, H)
+        img = img.repeat_interleave(K, dim=0) if img is not None else None
+        seqs = [[[] for _ in range(K)] for _ in range(B)]          # generated ids per beam
+        last = torch.full((B * K,), self.bos_id, dtype=torch.long, device=device)
+        scores = torch.full((B, K), float("-inf"), device=device)
+        scores[:, 0] = 0.0                                         # all beams start identical
+        finished = [[] for _ in range(B)]                          # (log p, ids incl. <eos>)
+        done = [False] * B
+        for t in range(max_len):
+            logp, h = self.step(last, h, img)
+            V = logp.shape[-1]
+            cand = (scores.unsqueeze(-1) + logp.view(B, K, V)).view(B, K * V)
+            # Among the 2K best extensions at least K do not end with <eos>.
+            top_s, top_i = cand.topk(2 * K, dim=1)
+            top_s, top_i = top_s.cpu().tolist(), top_i.cpu().tolist()
+            src = torch.zeros(B, K, dtype=torch.long)
+            words = torch.full((B, K), self.pad_id, dtype=torch.long)
+            new_scores = torch.full((B, K), float("-inf"))
+            for b in range(B):
+                if done[b]:
+                    continue
+                k = 0
+                for j, (s, i) in enumerate(zip(top_s[b], top_i[b])):
+                    beam, word = divmod(i, V)
+                    if word == self.eos_id:
+                        if j < K:                    # only <eos> among the K best extensions
+                            finished[b].append((s, seqs[b][beam] + [word]))
+                    elif k < K:
+                        src[b, k], words[b, k], new_scores[b, k] = beam, word, s
+                        k += 1
+                if len(finished[b]) >= K:
+                    done[b] = True
+                else:
+                    seqs[b] = [seqs[b][src[b, k]] + [words[b, k].item()] for k in range(K)]
+            if all(done):
+                break
+            flat = (torch.arange(B).unsqueeze(1) * K + src).view(-1).to(device)
+            h = h[:, flat]
+            last = words.view(-1).to(device)
+            scores = new_scores.to(device)
+        for b in range(B):                                         # open after max_len
+            if not done[b]:
+                finished[b] += [(scores[b, k].item(), seqs[b][k]) for k in range(K)
+                                if scores[b, k] > float("-inf")]
+        key = (lambda c: c[0] / len(c[1])) if length_norm else (lambda c: c[0])
+        best = [max(f, key=key) for f in finished]
+        T = max(len(ids) for _, ids in best)
+        out = torch.full((B, T), self.pad_id, dtype=torch.long)
+        for b, (_, ids) in enumerate(best):
+            out[b, :len(ids)] = torch.tensor(ids)
+        return out, torch.tensor([s for s, _ in best])
