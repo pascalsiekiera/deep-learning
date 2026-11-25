@@ -4,7 +4,7 @@ This repository contains our code for the course project. The first section desc
 and how to reproduce every table and figure of the report; the second section is the original
 description of the provided skeleton code.
 
-## Our code (Parts 2 and 3: image classification and image captioning)
+## Our code (Parts 2–4: image classification, image captioning, Transformer captioner)
 
 ### Setup
 
@@ -34,6 +34,7 @@ earlier ones):
 | Q3.3 | `python -m tasks.q3_3.encoders` | MLP vs CNN encoder, each frozen / fine-tuned / trained from scratch (3 seeds each) | 5 h |
 | Q3.3 | `python -m tasks.q3_3.class_mention` | class mention vs classification accuracy (linear probes), correlations, per-class plot | 5 min |
 | Q3.4 | `python -m tasks.q3_4.decoding` | greedy vs beam search (beam 1, 3, 5, 10; with and without length normalization) | 5 min |
+| Q4.1 | `python -m tasks.q4_1.transformer` | Transformer captioner: search (5 trials), 3 seeds, comparison with the RNN (greedy and beam 5, timing), cross-attention maps | 1.5 h |
 
 \* On an Apple M2 laptop (8 GB RAM); MLPs on the CPU, CNNs and all captioners on the Apple GPU (MPS). With a CUDA
 GPU everything uses the GPU.
@@ -55,7 +56,7 @@ GPU everything uses the GPU.
 
 | Path | Content |
 |---|---|
-| `models.py` | `MLP` (configurable depth, width, activation, dropout; no hidden layer = linear baseline) and `CNN` (VGG-style blocks of 3×3 conv, BatchNorm, ReLU, max pooling; global average pooling), both with `features()` for the image vector; `Captioner` (encoder + GRU decoder, image vector as initial state and optionally at every step; greedy decoding and beam search) |
+| `models.py` | `MLP` (configurable depth, width, activation, dropout; no hidden layer = linear baseline) and `CNN` (VGG-style blocks of 3×3 conv, BatchNorm, ReLU, max pooling; global average pooling), both with `features()` for the image vector; `Captioner` (encoder + GRU decoder, image vector as initial state and optionally at every step) and `TransformerCaptioner` (own pre-LN decoder blocks with causal self-attention and cross-attention to the 8×8 CNN feature grid); greedy decoding and beam search shared by both (`CaptionDecoding`) |
 | `text.py` | tokenizer (lowercase, words and punctuation as tokens) and `Vocabulary` (frequency threshold, `<pad>`, `<bos>`, `<eos>`, `<unk>`) |
 | `captioning.py` | Part 3 helpers: building a captioner from a config dict (encoder from Part 2, frozen or trained jointly), teacher-forcing loss with `ignore_index=<pad>`, perplexity, caption generation, caption metrics, `caption_run` (train and evaluate one config with one seed and save the result) |
 | `common.py` | shared helpers: building models/optimizers/schedulers from a config dict, data loaders with per-channel normalization, `run` (train one config with one seed and save the result), evaluation, image shifts and border controls, pixel permutation, confusion matrices, plots |

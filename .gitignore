@@ -3,3 +3,7 @@
 /.venv/
 __pycache__/
 .DS_Store
+
+# Latex Files
+main.tex
+references.bib

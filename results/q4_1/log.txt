@@ -1,0 +1,32 @@
+== 1. search (Transformer decoder, frozen CNN encoder, seed 0) ==
+[base        ] val loss 2.401 (ppl 11.0) | BLEU-4 val 15.99 test 13.89 | class mention test 66.5% | len 10.7 | best epoch 7 | 3,822,993 trainable | 40 s/epoch
+[dropout_0.3 ] val loss 2.430 (ppl 11.4) | BLEU-4 val 15.82 test 15.12 | class mention test 67.1% | len 10.8 | best epoch 12 | 3,822,993 trainable | 61 s/epoch
+[lr_1e-3     ] val loss 2.442 (ppl 11.5) | BLEU-4 val 15.22 test 15.12 | class mention test 66.6% | len 10.8 | best epoch 7 | 3,822,993 trainable | 69 s/epoch
+[layers_2    ] val loss 2.410 (ppl 11.1) | BLEU-4 val 13.66 test 14.28 | class mention test 69.6% | len 10.8 | best epoch 6 | 2,769,553 trainable | 50 s/epoch
+[layers_4    ] val loss 2.406 (ppl 11.1) | BLEU-4 val 14.10 test 13.70 | class mention test 66.2% | len 11.0 | best epoch 7 | 4,876,433 trainable | 56 s/epoch
+selected by validation BLEU-4: base (15.99)
+
+== 2. selected configuration with 3 seeds ==
+  seed 0: val loss 2.401 (ppl 11.0) | BLEU-4 val 15.99 test 13.89 | class mention test 66.5% | len 10.7 | best epoch 7
+  seed 1: val loss 2.402 (ppl 11.0) | BLEU-4 val 14.94 test 14.10 | class mention test 67.0% | len 10.9 | best epoch 7
+  seed 2: val loss 2.407 (ppl 11.1) | BLEU-4 val 15.47 test 14.33 | class mention test 67.8% | len 10.7 | best epoch 7
+saved /Users/psi/code/uni/deep-learning/figures/q4_1/curves.pdf
+
+== 3. comparison with the RNN captioner of Q3.2 ==
+
+RNN (GRU, Q3.2): params 4,635,515 (trainable 3,459,729) | best epochs [8, 5, 7] | 38 s/epoch recorded | timed 73 ms/step | val ppl 11.94 ± 0.07 | test ppl 12.29
+  beam1_validation   BLEU-4 14.91 ± 0.72 | mention 70.9 ± 0.3% | len 10.95 | distinct 1/2 186/538 | distinct captions 419 | decoding 0.9 s
+  beam1_test         BLEU-4 14.02 ± 0.83 | mention 68.6 ± 0.6% | len 10.96 | distinct 1/2 187/534 | distinct captions 415 | decoding 1.1 s
+  beam5_validation   BLEU-4 17.15 ± 0.78 | mention 71.5 ± 0.7% | len 10.28 | distinct 1/2 171/443 | distinct captions 293 | decoding 2.1 s
+  beam5_test         BLEU-4 16.27 ± 0.41 | mention 69.5 ± 0.6% | len 10.27 | distinct 1/2 165/429 | distinct captions 287 | decoding 2.1 s
+
+Transformer (base): params 4,998,779 (trainable 3,822,993) | best epochs [7, 7, 7] | 43 s/epoch recorded | timed 112 ms/step | val ppl 11.06 ± 0.03 | test ppl 11.40
+  beam1_validation   BLEU-4 15.47 ± 0.52 | mention 70.7 ± 1.0% | len 10.78 | distinct 1/2 185/556 | distinct captions 453 | decoding 4.2 s
+  beam1_test         BLEU-4 14.11 ± 0.22 | mention 67.1 ± 0.7% | len 10.76 | distinct 1/2 184/562 | distinct captions 447 | decoding 4.0 s
+  beam5_validation   BLEU-4 18.20 ± 1.10 | mention 70.5 ± 0.9% | len 9.97 | distinct 1/2 170/456 | distinct captions 331 | decoding 12.6 s
+  beam5_test         BLEU-4 16.93 ± 0.94 | mention 67.0 ± 0.1% | len 10.03 | distinct 1/2 174/466 | distinct captions 345 | decoding 13.7 s
+
+== 4. cross-attention (seed 0) ==
+attention entropy (uniform = 4.16) and mean max weight (uniform = 0.016) per block: {'block1': {'entropy': 2.987, 'max_weight': 0.163}, 'block2': {'entropy': 3.55, 'max_weight': 0.098}, 'block3': {'entropy': 3.631, 'max_weight': 0.099}}
+saved /Users/psi/code/uni/deep-learning/figures/q4_1/attention_last.pdf
+saved /Users/psi/code/uni/deep-learning/figures/q4_1/attention_mean.pdf

@@ -21,7 +21,7 @@ from common import (CHECKPOINT_DIR, RESULTS_DIR, build_model, full_config, get_d
                     load_results, release_device_memory)
 from data import caption_loaders, channel_stats, image_datasets
 from metrics import bleu4, class_mention_accuracy, distinct_ngrams
-from models import Captioner
+from models import Captioner, TransformerCaptioner
 from text import Vocabulary, tokenize
 from train import count_parameters, get_device, set_seed, train
 
@@ -52,11 +52,27 @@ CAP_DEFAULTS = {
 }
 
 
+# Part 4.1: with "decoder": "transformer" these keys are added (embed_dim, hidden_dim and
+# concat_image are then unused). Configs without "decoder" are GRU captioners, so the results of
+# Part 3 keep their configs.
+TRANSFORMER_DEFAULTS = {
+    "decoder": "transformer",
+    "d_model": 256,
+    "n_layers": 3,
+    "n_heads": 4,
+    "d_ff": 1024,
+    "dropout": 0.1,
+    "lr": 5e-4,
+}
+
+
 def cap_config(config):
-    unknown = set(config) - set(CAP_DEFAULTS)
+    defaults = ({**CAP_DEFAULTS, **TRANSFORMER_DEFAULTS} if config.get("decoder") == "transformer"
+                else CAP_DEFAULTS)
+    unknown = set(config) - set(defaults)
     if unknown:
         raise KeyError(f"unknown config keys: {sorted(unknown)}")
-    return {**CAP_DEFAULTS, **config}
+    return {**defaults, **config}
 
 
 @lru_cache(maxsize=4)
@@ -85,6 +101,11 @@ def build_captioner(config, seed):
     else:
         encoder = build_model(full_config(load_results(run)[0]["config"]))
     vocab = get_vocab(config["min_count"])
+    if config.get("decoder") == "transformer":
+        return TransformerCaptioner(encoder, len(vocab), vocab.pad_id, vocab.bos_id, vocab.eos_id,
+                                    d_model=config["d_model"], n_layers=config["n_layers"],
+                                    n_heads=config["n_heads"], d_ff=config["d_ff"],
+                                    dropout=config["dropout"], freeze_encoder=config["freeze"])
     return Captioner(encoder, len(vocab), vocab.pad_id, vocab.bos_id, vocab.eos_id,
                      embed_dim=config["embed_dim"], hidden_dim=config["hidden_dim"],
                      dropout=config["dropout"], concat_image=config["concat_image"],

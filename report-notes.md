@@ -721,3 +721,78 @@ because the conditional probability is ≤ 1. Equivalently, log p(y₁…y_t | x
 - In the example above, the 10 × 0.8 caption (average log p = log 0.8) beats the 6 × 0.7 caption (log 0.7).
 - In (a), normalization keeps the mean length at 11.0 for all beam sizes.
 - It can over-correct, favoring long captions with many easy tokens. A softer variant divides by L^α (α ∈ [0, 1]) or by the GNMT penalty ((5 + L)/6)^α, which interpolates between no normalization (α = 0) and full normalization (α = 1).
+
+# Part 4 (Bonus)
+
+## Q4.1 A Transformer captioner
+
+Code: `DecoderBlock`, `TransformerCaptioner` in `models.py` (greedy and beam search shared with the GRU captioner via the base class `CaptionDecoding`); config keys in `captioning.TRANSFORMER_DEFAULTS`; script `python -m tasks.q4_1.transformer` (log `results/q4_1/log.txt`, summary `results/q4_1/summary.json`, figures `figures/q4_1/{curves,attention_last,attention_mean}.pdf`).
+
+**Model** (trained from scratch, except the frozen CNN encoder, which is the same as for the RNN of Q3.2)
+- **Image:** the CNN of Q2.5 without its last max pooling and without global average pooling gives an 8 × 8 grid of 256-d feature vectors (64 regions of 8 × 8 pixels). Each region is projected to d_model and gets a learned position embedding of its region. These 64 vectors are the memory for cross-attention.
+- **Decoder blocks (own implementation)**, pre-LayerNorm as in GPT-2 (Xiong et al. 2020 show that pre-LN trains stably without warm-up; we use no warm-up), each with three residual branches:
+  1. causal self-attention over the caption (bool mask: position t attends to positions ≤ t);
+  2. cross-attention to the 64 image regions (queries from the caption, keys and values from the image);
+  3. feed-forward layer Linear(d, 4d) → GELU → Linear(4d, d).
+  The attention itself is `nn.MultiheadAttention` (allowed by the task). Dropout is applied to the embeddings, the attention weights and the residual branches.
+- Token embedding plus learned position embedding (max. 64 positions; the longest training caption has 53 tokens). Final LayerNorm. The output layer is tied to the token embedding (Press & Wolf 2017), plus a bias.
+- **No padding mask needed:** with causal attention a real token never attends to the `<pad>` tokens after the caption, and the loss ignores `<pad>` targets (as in 3.1).
+- **Decoding:** `step` appends the new token to the history and recomputes the whole prefix (no key/value cache; captions are short). Checked: step-wise log-probabilities = teacher-forcing log-probabilities (max. difference 5 × 10⁻⁶).
+- Base: d_model 256, 3 blocks, 4 heads, d_ff 1024, dropout 0.1; Adam lr 5e-4. Other settings as for the RNN (batch 64, gradient clipping 5, ≤ 20 epochs, early stopping on val loss with patience 4, best epoch restored).
+
+**Search** (seed 0, frozen CNN encoder, one change at a time; selection by val BLEU-4, greedy)
+
+| Trial | Trainable params | Val loss (ppl) | Val BLEU-4 | Test BLEU-4 | Best epoch |
+|---|---|---|---|---|---|
+| **base** (3 layers, dropout 0.1, lr 5e-4) | 3,822,993 | **2.401 (11.0)** | **15.99** | 13.89 | 7 |
+| dropout 0.3 | 3,822,993 | 2.430 (11.4) | 15.82 | 15.12 | 12 |
+| lr 1e-3 | 3,822,993 | 2.442 (11.5) | 15.22 | 15.12 | 7 |
+| 2 layers | 2,769,553 | 2.410 (11.1) | 13.66 | 14.28 | 6 |
+| 4 layers | 4,876,433 | 2.406 (11.1) | 14.10 | 13.70 | 7 |
+
+- The base is selected (best val BLEU-4 and best val loss). The perplexities of base, 2 and 4 layers are almost the same (11.0–11.1), but val BLEU differs by 2 points. Single-seed BLEU differences of this size are close to the seed noise, and once more perplexity and BLEU disagree (as in Q3.2).
+
+**Comparison with the RNN captioner of Q3.2** (3 seeds each, same frozen CNN; `q3_2/final` vs `q4_1/final`)
+
+| | RNN (GRU, Q3.2) | Transformer |
+|---|---|---|
+| Parameters total (trainable) | 4,635,515 (3,459,729) | 4,998,779 (3,822,993) |
+| Best epochs | 8, 5, 7 | 7, 7, 7 |
+| Val perplexity | 11.94 ± 0.07 | **11.06 ± 0.03** |
+| Test perplexity | 12.29 | **11.40** |
+| Val BLEU-4, greedy | 14.91 ± 0.72 | 15.47 ± 0.52 |
+| **Test BLEU-4, greedy** | 14.02 ± 0.83 | 14.11 ± 0.22 |
+| Val BLEU-4, beam 5 | 17.15 ± 0.78 | 18.20 ± 1.10 |
+| **Test BLEU-4, beam 5** | 16.27 ± 0.41 | 16.93 ± 0.94 |
+| Test class mention, greedy | 68.6 ± 0.6 % | 67.1 ± 0.7 % |
+| Test mean length, greedy / beam 5 | 10.96 / 10.27 | 10.76 / 10.03 |
+| Test distinct bigrams, greedy / beam 5 | 534 / 429 | 562 / 466 |
+| Test distinct captions, greedy / beam 5 | 415 / 287 | 447 / 345 |
+| Training time per epoch (recorded, incl. validation) | 38 s | 43 s |
+| Training time per step (timed in the same session, 100 steps) | 73 ms | 112 ms (1.5×) |
+| Decoding 1,000 test images, greedy / beam 5 | 1.1 s / 2.1 s | 4.0 s / 13.7 s |
+
+**Findings**
+- **The Transformer is a clearly better language model:** val perplexity 11.06 vs 11.94 (−0.88, 2·SE ≈ 0.09; all seeds within 0.03). Cross-attention to 64 regions gives it more image information than the single 256-d vector of the RNN, and self-attention sees the whole prefix directly instead of through a recurrent state.
+- **But the caption metrics are not meaningfully better:** test BLEU-4 greedy +0.09 (2·SE ≈ 1.0), beam 5 +0.66 (2·SE ≈ 1.2). On validation the gains are larger (+0.56 greedy, +1.05 beam 5) but also within noise. Class mention is slightly lower (67.1 vs 68.6 %, −1.5, just above 2·SE ≈ 1.1). So, again, a lower perplexity does not turn into a better greedy/beam caption one-to-one (as in Q3.2 and Q3.3).
+- **More diverse captions:** 447 vs 415 distinct test captions (greedy), 345 vs 287 (beam 5), more distinct bigrams. The Transformer copies the most generic templates less often.
+- **Beam search helps both models similarly** (+2.2 / +2.8 BLEU with beam 5) and shortens the captions similarly (see Q3.4).
+- **Cost:** 8 % more parameters (shared input/output embedding keeps it small); about 1.5× slower per training step in a controlled timing (the recorded per-epoch times, 38 vs 43 s, come from different sessions and include validation). It converges in the same number of epochs (best epoch 7). Decoding is 4–6.5× slower because our implementation recomputes the whole prefix at every step (O(T²) per caption; a key/value cache would remove most of this).
+- Training was stable without learning-rate warm-up (pre-LN).
+
+**Cross-attention** (`figures/q4_1/attention_last.pdf`: last block; `attention_mean.pdf`: mean over blocks; 6 test images, one per class airplane/dog/elephant/giraffe/motorcycle/truck, greedy captions of seed 0; each map = attention, averaged over heads, used to generate the word above it, bilinearly upsampled from 8 × 8)
+- **When generating the subject of the caption, the model looks at the object:** "a large airplane" → the plane's nose and engines; "a dog" → the dog's head (#8); "a giraffe" → the giraffe's body and legs; "a red truck" → the red truck. Already for the first word "a", the attention is on the object: the model decides what the caption is about at the first step.
+- **Function words and scene words have diffuse attention** ("of", "the", "in", "next to"); scene words attend to large background areas ("field with trees in the background" → the upper image area / horizon; "runway" → the lower part of the image).
+- **Errors are visible:** for the motorcycle image #6 ("a dog sitting on a bench next to a truck"), the attention for "dog" is on a dark object in the centre, so the model "sees" a dog there; for the elephant image #2 ("a group of people standing next to a baby elephant") it attends to the fence bars for "people".
+- **Quantified** (test set, seed 0, all generated tokens; entropy of the attention over the 64 regions, uniform = log 64 = 4.16; mean maximum weight, uniform = 0.016):
+
+| Generated token | n | Block 1 entropy / max | Block 2 entropy / max | Block 3 (last) entropy / max |
+|---|---|---|---|---|
+| first token | 1,000 | 2.84 / 0.167 | 3.63 / 0.136 | **3.32 / 0.163** |
+| class word | 1,068 | 3.29 / 0.139 | 3.62 / 0.111 | **3.55 / 0.137** |
+| other content word | 3,756 | 3.09 / 0.158 | 3.56 / 0.099 | 3.66 / 0.098 |
+| function word | 3,937 | 2.92 / 0.165 | 3.61 / 0.080 | **3.78 / 0.075** |
+| `<eos>` / "." | 1,948 | 2.82 / 0.178 | 3.35 / 0.107 | 3.49 / 0.096 |
+
+  In the last block, the attention is most focused when the model generates the first word and the class word (max weight 0.16 / 0.14, 9–10× uniform) and most diffuse for function words (0.075). Block 1 is sharply focused for all tokens alike (entropy 2.8–3.3), i.e. its attention does not depend much on the word; the word-specific attention appears in the last block.
+- Caveat: attention weights show where the model reads from, not necessarily what causes its prediction; the grid is coarse (8 × 8 regions of a 64 × 64 image, and each CNN feature has a large receptive field).

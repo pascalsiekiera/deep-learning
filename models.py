@@ -97,40 +97,15 @@ class CNN(nn.Module):
         return self.head(self.pool(self.conv(x)))
 
 
-class Captioner(nn.Module):
-    """Encoder-decoder captioner in the style of Vinyals et al. (2015) (Part 3).
+class CaptionDecoding(nn.Module):
+    """Decoding shared by the captioners (GRU and Transformer). A subclass provides
 
-    encoder: an MLP or CNN from Part 2; `encoder.features(images)` gives one vector per image.
-    The vector is projected to the initial hidden state of a GRU decoder (h0 = tanh(W f + b));
-    with `concat_image=True` the projected vector is also concatenated to the word embedding at
-    every time step. The GRU output goes through dropout and a linear layer to the vocabulary.
+        encode(images) -> (state, context): `state` has the batch in dimension 1 (the GRU hidden
+            state (1, B, H); for the Transformer the tokens generated so far (1, B, t)), `context`
+            in dimension 0 (or None);
+        step(tokens, state, context) -> (log-probabilities (B, V) of the next token, new state);
 
-    Args:
-        encoder: module with .features(x) and .feature_dim
-        vocab_size: size of the output vocabulary (including the special tokens)
-        pad_id, bos_id, eos_id: ids of <pad>, <bos>, <eos>
-        embed_dim, hidden_dim: word embedding and GRU state sizes
-        dropout: dropout on the embeddings and on the GRU outputs
-        concat_image: also feed the image vector at every step
-        freeze_encoder: keep the encoder fixed (no gradients, always in eval mode)
-    """
-
-    def __init__(self, encoder, vocab_size, pad_id, bos_id, eos_id, embed_dim=256, hidden_dim=512,
-                 dropout=0.3, concat_image=False, freeze_encoder=False):
-        super().__init__()
-        self.encoder = encoder
-        self.freeze_encoder = freeze_encoder
-        if freeze_encoder:
-            for p in self.encoder.parameters():
-                p.requires_grad_(False)
-        self.pad_id, self.bos_id, self.eos_id = pad_id, bos_id, eos_id
-        self.concat_image = concat_image
-        self.init_h = nn.Linear(encoder.feature_dim, hidden_dim)
-        self.image_in = nn.Linear(encoder.feature_dim, embed_dim) if concat_image else None
-        self.embed = nn.Embedding(vocab_size, embed_dim, padding_idx=pad_id)
-        self.gru = nn.GRU(embed_dim * (2 if concat_image else 1), hidden_dim, batch_first=True)
-        self.drop = nn.Dropout(dropout)
-        self.out = nn.Linear(hidden_dim, vocab_size)
+    and the attributes encoder, freeze_encoder, pad_id, bos_id, eos_id."""
 
     def train(self, mode=True):
         super().train(mode)
@@ -138,34 +113,6 @@ class Captioner(nn.Module):
             self.encoder.eval()
         return self
 
-    def encode(self, images):
-        """Image vectors and the decoder's context: (h0 (1, B, H), per-step image input or None)."""
-        if self.freeze_encoder:
-            with torch.no_grad():
-                f = self.encoder.features(images)
-        else:
-            f = self.encoder.features(images)
-        h0 = torch.tanh(self.init_h(f)).unsqueeze(0)
-        img = self.image_in(f) if self.concat_image else None
-        return h0, img
-
-    def _inputs(self, tokens, img):
-        x = self.drop(self.embed(tokens))                      # (B, T, E)
-        if img is not None:
-            x = torch.cat([x, img.unsqueeze(1).expand(-1, x.shape[1], -1)], dim=-1)
-        return x
-
-    def forward(self, images, tokens):
-        """Teacher forcing: logits (B, T, V) for next-token prediction after each input token."""
-        h0, img = self.encode(images)
-        out, _ = self.gru(self._inputs(tokens, img), h0)
-        return self.out(self.drop(out))
-
-    def step(self, tokens, h, img):
-        """One decoding step for a batch of last tokens (B,): log-probabilities (B, V) and the
-        new hidden state. Used by greedy decoding and beam search."""
-        out, h = self.gru(self._inputs(tokens.unsqueeze(1), img), h)
-        return torch.log_softmax(self.out(out[:, 0]), dim=-1), h
 
     @torch.no_grad()
     def greedy(self, images, max_len=25):
@@ -251,3 +198,200 @@ class Captioner(nn.Module):
         for b, (_, ids) in enumerate(best):
             out[b, :len(ids)] = torch.tensor(ids)
         return out, torch.tensor([s for s, _ in best])
+
+
+
+class Captioner(CaptionDecoding):
+    """Encoder-decoder captioner in the style of Vinyals et al. (2015) (Part 3).
+
+    encoder: an MLP or CNN from Part 2; `encoder.features(images)` gives one vector per image.
+    The vector is projected to the initial hidden state of a GRU decoder (h0 = tanh(W f + b));
+    with `concat_image=True` the projected vector is also concatenated to the word embedding at
+    every time step. The GRU output goes through dropout and a linear layer to the vocabulary.
+
+    Args:
+        encoder: module with .features(x) and .feature_dim
+        vocab_size: size of the output vocabulary (including the special tokens)
+        pad_id, bos_id, eos_id: ids of <pad>, <bos>, <eos>
+        embed_dim, hidden_dim: word embedding and GRU state sizes
+        dropout: dropout on the embeddings and on the GRU outputs
+        concat_image: also feed the image vector at every step
+        freeze_encoder: keep the encoder fixed (no gradients, always in eval mode)
+    """
+
+    def __init__(self, encoder, vocab_size, pad_id, bos_id, eos_id, embed_dim=256, hidden_dim=512,
+                 dropout=0.3, concat_image=False, freeze_encoder=False):
+        super().__init__()
+        self.encoder = encoder
+        self.freeze_encoder = freeze_encoder
+        if freeze_encoder:
+            for p in self.encoder.parameters():
+                p.requires_grad_(False)
+        self.pad_id, self.bos_id, self.eos_id = pad_id, bos_id, eos_id
+        self.concat_image = concat_image
+        self.init_h = nn.Linear(encoder.feature_dim, hidden_dim)
+        self.image_in = nn.Linear(encoder.feature_dim, embed_dim) if concat_image else None
+        self.embed = nn.Embedding(vocab_size, embed_dim, padding_idx=pad_id)
+        self.gru = nn.GRU(embed_dim * (2 if concat_image else 1), hidden_dim, batch_first=True)
+        self.drop = nn.Dropout(dropout)
+        self.out = nn.Linear(hidden_dim, vocab_size)
+
+
+    def encode(self, images):
+        """Image vectors and the decoder's context: (h0 (1, B, H), per-step image input or None)."""
+        if self.freeze_encoder:
+            with torch.no_grad():
+                f = self.encoder.features(images)
+        else:
+            f = self.encoder.features(images)
+        h0 = torch.tanh(self.init_h(f)).unsqueeze(0)
+        img = self.image_in(f) if self.concat_image else None
+        return h0, img
+
+    def _inputs(self, tokens, img):
+        x = self.drop(self.embed(tokens))                      # (B, T, E)
+        if img is not None:
+            x = torch.cat([x, img.unsqueeze(1).expand(-1, x.shape[1], -1)], dim=-1)
+        return x
+
+    def forward(self, images, tokens):
+        """Teacher forcing: logits (B, T, V) for next-token prediction after each input token."""
+        h0, img = self.encode(images)
+        out, _ = self.gru(self._inputs(tokens, img), h0)
+        return self.out(self.drop(out))
+
+    def step(self, tokens, h, img):
+        """One decoding step for a batch of last tokens (B,): log-probabilities (B, V) and the
+        new hidden state. Used by greedy decoding and beam search."""
+        out, h = self.gru(self._inputs(tokens.unsqueeze(1), img), h)
+        return torch.log_softmax(self.out(out[:, 0]), dim=-1), h
+
+
+class DecoderBlock(nn.Module):
+    """One pre-LayerNorm Transformer decoder block (GPT-2 style, plus cross-attention):
+
+        x = x + Dropout(SelfAttention(LN(x)))        causal: position t attends to positions <= t
+        x = x + Dropout(CrossAttention(LN(x), image)) queries from the caption, keys/values = image
+        x = x + Dropout(FFN(LN(x)))                  FFN = Linear(d, d_ff) -> GELU -> Linear(d_ff, d)
+
+    The attention itself is nn.MultiheadAttention (multi-head scaled dot-product attention)."""
+
+    def __init__(self, d_model, n_heads, d_ff, dropout):
+        super().__init__()
+        self.ln_self, self.ln_cross, self.ln_ff = (nn.LayerNorm(d_model) for _ in range(3))
+        self.self_attn = nn.MultiheadAttention(d_model, n_heads, dropout=dropout, batch_first=True)
+        self.cross_attn = nn.MultiheadAttention(d_model, n_heads, dropout=dropout, batch_first=True)
+        self.ff = nn.Sequential(nn.Linear(d_model, d_ff), nn.GELU(), nn.Linear(d_ff, d_model))
+        self.drop = nn.Dropout(dropout)
+
+    def forward(self, x, memory, causal_mask, need_weights=False):
+        """x (B, T, d), memory (B, R, d), causal_mask (T, T) bool (True = not allowed). Returns the
+        new x and, with need_weights, the cross-attention weights (B, T, R) averaged over heads."""
+        h = self.ln_self(x)
+        x = x + self.drop(self.self_attn(h, h, h, attn_mask=causal_mask, need_weights=False)[0])
+        h = self.ln_cross(x)
+        a, w = self.cross_attn(h, memory, memory, need_weights=need_weights)
+        x = x + self.drop(a)
+        x = x + self.drop(self.ff(self.ln_ff(x)))
+        return x, w
+
+
+class TransformerCaptioner(CaptionDecoding):
+    """Captioner with a small Transformer decoder (trained from scratch) that cross-attends to a
+    grid of CNN features (Part 4.1).
+
+    Image: the CNN encoder without its last max pooling (and without global average pooling)
+    gives a grid of feature vectors, (64 / 2^(blocks - 1))^2 = 8 x 8 = 64 regions of 256 channels
+    for our CNN; each is projected to d_model and gets a learned position embedding of its region.
+    Caption: token embedding + learned position embedding, `n_layers` DecoderBlocks, final
+    LayerNorm, and an output layer that shares its weights with the token embedding (as in
+    GPT-2). Padding needs no mask: with causal attention a real token never attends to the <pad>
+    tokens after the caption, and the loss ignores the <pad> targets.
+
+    Args:
+        encoder: a CNN (models.CNN)
+        vocab_size, pad_id, bos_id, eos_id: as for Captioner
+        d_model, n_layers, n_heads, d_ff: decoder size
+        dropout: dropout on embeddings, attention weights and residual branches
+        max_len: maximum caption length incl. <bos> (position embeddings)
+        image_size: input image size (to compute the number of regions)
+        freeze_encoder: keep the encoder fixed (no gradients, always in eval mode)
+    """
+
+    def __init__(self, encoder, vocab_size, pad_id, bos_id, eos_id, d_model=256, n_layers=3,
+                 n_heads=4, d_ff=1024, dropout=0.1, max_len=64, image_size=64, freeze_encoder=True):
+        super().__init__()
+        if not isinstance(encoder, CNN):
+            raise TypeError("TransformerCaptioner needs a CNN encoder (grid of features)")
+        self.encoder = encoder
+        self.freeze_encoder = freeze_encoder
+        if freeze_encoder:
+            for p in self.encoder.parameters():
+                p.requires_grad_(False)
+        self.pad_id, self.bos_id, self.eos_id = pad_id, bos_id, eos_id
+        n_pools = sum(isinstance(m, nn.MaxPool2d) for m in encoder.conv)
+        self.grid_size = image_size // 2 ** (n_pools - 1)
+        self.img_proj = nn.Linear(encoder.feature_dim, d_model)
+        self.img_pos = nn.Parameter(0.02 * torch.randn(1, self.grid_size ** 2, d_model))
+        self.embed = nn.Embedding(vocab_size, d_model, padding_idx=pad_id)
+        nn.init.normal_(self.embed.weight, std=0.02)
+        with torch.no_grad():
+            self.embed.weight[pad_id].zero_()
+        self.pos = nn.Parameter(0.02 * torch.randn(1, max_len, d_model))
+        self.blocks = nn.ModuleList(DecoderBlock(d_model, n_heads, d_ff, dropout)
+                                    for _ in range(n_layers))
+        self.ln_f = nn.LayerNorm(d_model)
+        self.out_bias = nn.Parameter(torch.zeros(vocab_size))
+        self.drop = nn.Dropout(dropout)
+
+    def grid(self, images):
+        """CNN feature grid (B, R, C), R = grid_size^2 regions in row-major order."""
+        g = self.encoder.conv[:-1](images)                       # without the last max pooling
+        return g.flatten(2).transpose(1, 2)
+
+    def encode(self, images):
+        """(tokens generated so far (1, B, 0), image memory (B, R, d_model))."""
+        if self.freeze_encoder:
+            with torch.no_grad():
+                g = self.grid(images)
+        else:
+            g = self.grid(images)
+        memory = self.drop(self.img_proj(g) + self.img_pos)
+        state = torch.zeros(1, images.shape[0], 0, dtype=torch.long, device=images.device)
+        return state, memory
+
+    def decode(self, tokens, memory, need_weights=False):
+        """Logits (B, T, V) for the next token after each input token, and (with need_weights)
+        the cross-attention weights of every block, each (B, T, R)."""
+        T = tokens.shape[1]
+        x = self.drop(self.embed(tokens) + self.pos[:, :T])
+        mask = torch.triu(torch.ones(T, T, dtype=torch.bool, device=tokens.device), diagonal=1)
+        weights = []
+        for block in self.blocks:
+            x, w = block(x, memory, mask, need_weights)
+            weights.append(w)
+        logits = self.ln_f(x) @ self.embed.weight.T + self.out_bias
+        return logits, weights
+
+    def forward(self, images, tokens):
+        """Teacher forcing: logits (B, T, V)."""
+        return self.decode(tokens, self.encode(images)[1])[0]
+
+    def step(self, tokens, history, memory):
+        """Append `tokens` (B,) to the history (1, B, t) and return the log-probabilities of the
+        next token (B, V) and the new history. Recomputes the whole prefix (no key/value cache;
+        captions are short)."""
+        history = torch.cat([history, tokens.view(1, -1, 1)], dim=2)
+        logits = self.decode(history[0], memory)[0][:, -1]
+        return torch.log_softmax(logits, dim=-1), history
+
+    @torch.no_grad()
+    def attention(self, images, max_len=25):
+        """Greedy captions (B, T) and the cross-attention weights over the image regions that were
+        used to generate each token: list over blocks of (B, T, grid_size, grid_size)."""
+        ids = self.greedy(images, max_len=max_len)
+        _, memory = self.encode(images)
+        inputs = torch.cat([torch.full_like(ids[:, :1], self.bos_id), ids[:, :-1]], dim=1)
+        _, weights = self.decode(inputs, memory, need_weights=True)
+        g = self.grid_size
+        return ids, [w.view(*w.shape[:2], g, g) for w in weights]
