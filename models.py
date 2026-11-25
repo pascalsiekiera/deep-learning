@@ -1,3 +1,4 @@
+import torch
 from torch import nn
 
 ACTIVATIONS = {"relu": nn.ReLU, "tanh": nn.Tanh, "gelu": nn.GELU, "sigmoid": nn.Sigmoid,
@@ -30,6 +31,15 @@ class MLP(nn.Module):
 
     def forward(self, x):
         return self.net(x)
+
+    def features(self, x):
+        """Activations of the last hidden layer (batch, hidden[-1]), e.g. to use the MLP as an
+        image encoder in Part 3."""
+        return self.net[:-1](x)
+
+    @property
+    def feature_dim(self):
+        return self.net[-1].in_features
 
     @property
     def first_layer(self):
@@ -79,5 +89,99 @@ class CNN(nn.Module):
     def features(self, x):
         return self.pool(self.conv(x)).flatten(1)
 
+    @property
+    def feature_dim(self):
+        return self.head[-1].in_features
+
     def forward(self, x):
         return self.head(self.pool(self.conv(x)))
+
+
+class Captioner(nn.Module):
+    """Encoder-decoder captioner in the style of Vinyals et al. (2015) (Part 3).
+
+    encoder: an MLP or CNN from Part 2; `encoder.features(images)` gives one vector per image.
+    The vector is projected to the initial hidden state of a GRU decoder (h0 = tanh(W f + b));
+    with `concat_image=True` the projected vector is also concatenated to the word embedding at
+    every time step. The GRU output goes through dropout and a linear layer to the vocabulary.
+
+    Args:
+        encoder: module with .features(x) and .feature_dim
+        vocab_size: size of the output vocabulary (including the special tokens)
+        pad_id, bos_id, eos_id: ids of <pad>, <bos>, <eos>
+        embed_dim, hidden_dim: word embedding and GRU state sizes
+        dropout: dropout on the embeddings and on the GRU outputs
+        concat_image: also feed the image vector at every step
+        freeze_encoder: keep the encoder fixed (no gradients, always in eval mode)
+    """
+
+    def __init__(self, encoder, vocab_size, pad_id, bos_id, eos_id, embed_dim=256, hidden_dim=512,
+                 dropout=0.3, concat_image=False, freeze_encoder=False):
+        super().__init__()
+        self.encoder = encoder
+        self.freeze_encoder = freeze_encoder
+        if freeze_encoder:
+            for p in self.encoder.parameters():
+                p.requires_grad_(False)
+        self.pad_id, self.bos_id, self.eos_id = pad_id, bos_id, eos_id
+        self.concat_image = concat_image
+        self.init_h = nn.Linear(encoder.feature_dim, hidden_dim)
+        self.image_in = nn.Linear(encoder.feature_dim, embed_dim) if concat_image else None
+        self.embed = nn.Embedding(vocab_size, embed_dim, padding_idx=pad_id)
+        self.gru = nn.GRU(embed_dim * (2 if concat_image else 1), hidden_dim, batch_first=True)
+        self.drop = nn.Dropout(dropout)
+        self.out = nn.Linear(hidden_dim, vocab_size)
+
+    def train(self, mode=True):
+        super().train(mode)
+        if self.freeze_encoder:   # a frozen encoder stays in eval mode (BatchNorm, dropout)
+            self.encoder.eval()
+        return self
+
+    def encode(self, images):
+        """Image vectors and the decoder's context: (h0 (1, B, H), per-step image input or None)."""
+        if self.freeze_encoder:
+            with torch.no_grad():
+                f = self.encoder.features(images)
+        else:
+            f = self.encoder.features(images)
+        h0 = torch.tanh(self.init_h(f)).unsqueeze(0)
+        img = self.image_in(f) if self.concat_image else None
+        return h0, img
+
+    def _inputs(self, tokens, img):
+        x = self.drop(self.embed(tokens))                      # (B, T, E)
+        if img is not None:
+            x = torch.cat([x, img.unsqueeze(1).expand(-1, x.shape[1], -1)], dim=-1)
+        return x
+
+    def forward(self, images, tokens):
+        """Teacher forcing: logits (B, T, V) for next-token prediction after each input token."""
+        h0, img = self.encode(images)
+        out, _ = self.gru(self._inputs(tokens, img), h0)
+        return self.out(self.drop(out))
+
+    def step(self, tokens, h, img):
+        """One decoding step for a batch of last tokens (B,): log-probabilities (B, V) and the
+        new hidden state. Used by greedy decoding and beam search."""
+        out, h = self.gru(self._inputs(tokens.unsqueeze(1), img), h)
+        return torch.log_softmax(self.out(out[:, 0]), dim=-1), h
+
+    @torch.no_grad()
+    def greedy(self, images, max_len=25):
+        """Greedy decoding: token ids (B, <= max_len), each row ending with <eos> or cut at
+        max_len; positions after <eos> are <pad>."""
+        h, img = self.encode(images)
+        B = images.shape[0]
+        tokens = torch.full((B,), self.bos_id, dtype=torch.long, device=images.device)
+        done = torch.zeros(B, dtype=torch.bool, device=images.device)
+        result = []
+        for _ in range(max_len):
+            logp, h = self.step(tokens, h, img)
+            tokens = logp.argmax(-1)
+            tokens = torch.where(done, torch.full_like(tokens, self.pad_id), tokens)
+            result.append(tokens)
+            done |= tokens == self.eos_id
+            if done.all():
+                break
+        return torch.stack(result, dim=1)

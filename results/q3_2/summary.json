@@ -1,0 +1,626 @@
+{
+ "defaults": {
+  "encoder": "cnn",
+  "pretrained": true,
+  "freeze": true,
+  "embed_dim": 256,
+  "hidden_dim": 512,
+  "dropout": 0.3,
+  "concat_image": false,
+  "lr": 0.001,
+  "encoder_lr": null,
+  "weight_decay": 0.0,
+  "batch_size": 64,
+  "epochs": 20,
+  "patience": 4,
+  "grad_clip": 5.0,
+  "min_count": 5,
+  "max_len": 25
+ },
+ "base": {
+  "encoder": "cnn",
+  "pretrained": true,
+  "freeze": true
+ },
+ "trials": {
+  "base": {},
+  "concat_image": {
+   "concat_image": true
+  },
+  "dropout_0.5": {
+   "dropout": 0.5
+  },
+  "lr_3e-4": {
+   "lr": 0.0003
+  },
+  "hidden_256": {
+   "hidden_dim": 256
+  }
+ },
+ "search": {
+  "base": {
+   "config": {
+    "encoder": "cnn",
+    "pretrained": true,
+    "freeze": true,
+    "embed_dim": 256,
+    "hidden_dim": 512,
+    "dropout": 0.3,
+    "concat_image": false,
+    "lr": 0.001,
+    "encoder_lr": null,
+    "weight_decay": 0.0,
+    "batch_size": 64,
+    "epochs": 20,
+    "patience": 4,
+    "grad_clip": 5.0,
+    "min_count": 5,
+    "max_len": 25
+   },
+   "loss": {
+    "train": 1.9570589090221557,
+    "validation": 2.47969203464171,
+    "test": 2.507806418530464
+   },
+   "perplexity": {
+    "train": 7.078477972943783,
+    "validation": 11.93758748828675,
+    "test": 12.277967776740192
+   },
+   "metrics": {
+    "validation": {
+     "bleu4": 13.829293073851098,
+     "class_mention": 0.67,
+     "mean_length": 10.756,
+     "distinct_1": 174,
+     "distinct_2": 495,
+     "unk_fraction": 0.02026775753068055
+    },
+    "test": {
+     "bleu4": 12.0199779331349,
+     "class_mention": 0.663,
+     "mean_length": 10.778,
+     "distinct_1": 161,
+     "distinct_2": 465,
+     "unk_fraction": 0.015401744293932084
+    }
+   },
+   "best_epoch": 6
+  },
+  "concat_image": {
+   "config": {
+    "encoder": "cnn",
+    "pretrained": true,
+    "freeze": true,
+    "embed_dim": 256,
+    "hidden_dim": 512,
+    "dropout": 0.3,
+    "concat_image": true,
+    "lr": 0.001,
+    "encoder_lr": null,
+    "weight_decay": 0.0,
+    "batch_size": 64,
+    "epochs": 20,
+    "patience": 4,
+    "grad_clip": 5.0,
+    "min_count": 5,
+    "max_len": 25
+   },
+   "loss": {
+    "train": 1.8668658649168297,
+    "validation": 2.4747537187562503,
+    "test": 2.5013038758056716
+   },
+   "perplexity": {
+    "train": 6.4679930352740875,
+    "validation": 11.878781231803346,
+    "test": 12.198388780014854
+   },
+   "metrics": {
+    "validation": {
+     "bleu4": 15.008590902366159,
+     "class_mention": 0.709,
+     "mean_length": 10.873,
+     "distinct_1": 199,
+     "distinct_2": 566,
+     "unk_fraction": 0.006529936540053343
+    },
+    "test": {
+     "bleu4": 14.954419060622136,
+     "class_mention": 0.692,
+     "mean_length": 10.886,
+     "distinct_1": 195,
+     "distinct_2": 559,
+     "unk_fraction": 0.004317471982362668
+    }
+   },
+   "best_epoch": 8
+  },
+  "dropout_0.5": {
+   "config": {
+    "encoder": "cnn",
+    "pretrained": true,
+    "freeze": true,
+    "embed_dim": 256,
+    "hidden_dim": 512,
+    "dropout": 0.5,
+    "concat_image": false,
+    "lr": 0.001,
+    "encoder_lr": null,
+    "weight_decay": 0.0,
+    "batch_size": 64,
+    "epochs": 20,
+    "patience": 4,
+    "grad_clip": 5.0,
+    "min_count": 5,
+    "max_len": 25
+   },
+   "loss": {
+    "train": 1.9379796861952168,
+    "validation": 2.498096374811035,
+    "test": 2.5234737734360695
+   },
+   "perplexity": {
+    "train": 6.944706302083266,
+    "validation": 12.15932511772859,
+    "test": 12.471845867992778
+   },
+   "metrics": {
+    "validation": {
+     "bleu4": 14.553072509410935,
+     "class_mention": 0.697,
+     "mean_length": 11.067,
+     "distinct_1": 175,
+     "distinct_2": 515,
+     "unk_fraction": 0.0030721966205837174
+    },
+    "test": {
+     "bleu4": 14.055632398732662,
+     "class_mention": 0.692,
+     "mean_length": 11.062,
+     "distinct_1": 178,
+     "distinct_2": 519,
+     "unk_fraction": 0.0021695895859699874
+    }
+   },
+   "best_epoch": 14
+  },
+  "lr_3e-4": {
+   "config": {
+    "encoder": "cnn",
+    "pretrained": true,
+    "freeze": true,
+    "embed_dim": 256,
+    "hidden_dim": 512,
+    "dropout": 0.3,
+    "concat_image": false,
+    "lr": 0.0003,
+    "encoder_lr": null,
+    "weight_decay": 0.0,
+    "batch_size": 64,
+    "epochs": 20,
+    "patience": 4,
+    "grad_clip": 5.0,
+    "min_count": 5,
+    "max_len": 25
+   },
+   "loss": {
+    "train": 1.8862952457282518,
+    "validation": 2.45042244130641,
+    "test": 2.4784419986822575
+   },
+   "perplexity": {
+    "train": 6.594890916693578,
+    "validation": 11.59324314970502,
+    "test": 11.922674397549047
+   },
+   "metrics": {
+    "validation": {
+     "bleu4": 13.906409725128796,
+     "class_mention": 0.706,
+     "mean_length": 10.951,
+     "distinct_1": 155,
+     "distinct_2": 444,
+     "unk_fraction": 0.01369737923477308
+    },
+    "test": {
+     "bleu4": 13.682949438120195,
+     "class_mention": 0.678,
+     "mean_length": 10.994,
+     "distinct_1": 159,
+     "distinct_2": 462,
+     "unk_fraction": 0.013098053483718392
+    }
+   },
+   "best_epoch": 18
+  },
+  "hidden_256": {
+   "config": {
+    "encoder": "cnn",
+    "pretrained": true,
+    "freeze": true,
+    "embed_dim": 256,
+    "hidden_dim": 256,
+    "dropout": 0.3,
+    "concat_image": false,
+    "lr": 0.001,
+    "encoder_lr": null,
+    "weight_decay": 0.0,
+    "batch_size": 64,
+    "epochs": 20,
+    "patience": 4,
+    "grad_clip": 5.0,
+    "min_count": 5,
+    "max_len": 25
+   },
+   "loss": {
+    "train": 1.94483477885845,
+    "validation": 2.4693972722261925,
+    "test": 2.500306612332858
+   },
+   "perplexity": {
+    "train": 6.992476454645213,
+    "validation": 11.81532328157693,
+    "test": 12.18622983630029
+   },
+   "metrics": {
+    "validation": {
+     "bleu4": 13.144686470611394,
+     "class_mention": 0.705,
+     "mean_length": 10.995,
+     "distinct_1": 144,
+     "distinct_2": 399,
+     "unk_fraction": 0.0049113233287858115
+    },
+    "test": {
+     "bleu4": 14.108294634271173,
+     "class_mention": 0.689,
+     "mean_length": 11.022,
+     "distinct_1": 155,
+     "distinct_2": 426,
+     "unk_fraction": 0.005806568680820178
+    }
+   },
+   "best_epoch": 15
+  }
+ },
+ "selected": "concat_image",
+ "selected_config": {
+  "encoder": "cnn",
+  "pretrained": true,
+  "freeze": true,
+  "embed_dim": 256,
+  "hidden_dim": 512,
+  "dropout": 0.3,
+  "concat_image": true,
+  "lr": 0.001,
+  "encoder_lr": null,
+  "weight_decay": 0.0,
+  "batch_size": 64,
+  "epochs": 20,
+  "patience": 4,
+  "grad_clip": 5.0,
+  "min_count": 5,
+  "max_len": 25
+ },
+ "final": {
+  "validation_bleu4": {
+   "mean": 14.913880463391903,
+   "std": 0.7221814565134209,
+   "values": [
+    15.008590902366159,
+    14.149016703402417,
+    15.584033784407133
+   ]
+  },
+  "validation_class_mention": {
+   "mean": 0.7086666666666667,
+   "std": 0.0025166114784235852,
+   "values": [
+    0.709,
+    0.706,
+    0.711
+   ]
+  },
+  "validation_mean_length": {
+   "mean": 10.948333333333332,
+   "std": 0.12617580327992087,
+   "values": [
+    10.873,
+    10.878,
+    11.094
+   ]
+  },
+  "validation_distinct_1": {
+   "mean": 185.66666666666666,
+   "std": 12.220201853215574,
+   "values": [
+    199,
+    175,
+    183
+   ]
+  },
+  "validation_distinct_2": {
+   "mean": 537.6666666666666,
+   "std": 27.098585448936873,
+   "values": [
+    566,
+    512,
+    535
+   ]
+  },
+  "test_bleu4": {
+   "mean": 14.021132773415408,
+   "std": 0.828681681496545,
+   "values": [
+    14.954419060622136,
+    13.37160753984189,
+    13.7373717197822
+   ]
+  },
+  "test_class_mention": {
+   "mean": 0.6856666666666666,
+   "std": 0.006027713773341655,
+   "values": [
+    0.692,
+    0.685,
+    0.68
+   ]
+  },
+  "test_mean_length": {
+   "mean": 10.955333333333334,
+   "std": 0.12095591483401501,
+   "values": [
+    10.886,
+    10.885,
+    11.095
+   ]
+  },
+  "test_distinct_1": {
+   "mean": 187.33333333333334,
+   "std": 7.094598884597588,
+   "values": [
+    195,
+    186,
+    181
+   ]
+  },
+  "test_distinct_2": {
+   "mean": 533.6666666666666,
+   "std": 22.501851775650227,
+   "values": [
+    559,
+    526,
+    516
+   ]
+  },
+  "train_loss": {
+   "mean": 1.9400639270617805,
+   "std": 0.09097011150666562,
+   "values": [
+    1.8668658649168297,
+    2.0419093676998643,
+    1.9114165485686474
+   ]
+  },
+  "train_ppl": {
+   "mean": 6.978654039352015,
+   "std": 0.6463174596616338,
+   "values": [
+    6.4679930352740875,
+    7.705307427371555,
+    6.762661655410401
+   ]
+  },
+  "validation_loss": {
+   "mean": 2.480001665331547,
+   "std": 0.005991119060272271,
+   "values": [
+    2.4747537187562503,
+    2.4865292011140814,
+    2.478722076124309
+   ]
+  },
+  "validation_ppl": {
+   "mean": 11.941427263222566,
+   "std": 0.07160768721136208,
+   "values": [
+    11.878781231803346,
+    12.019486420496568,
+    11.926014137367785
+   ]
+  },
+  "test_loss": {
+   "mean": 2.5090687745404465,
+   "std": 0.007979646029090667,
+   "values": [
+    2.5013038758056716,
+    2.517247095353606,
+    2.508655352462062
+   ]
+  },
+  "test_ppl": {
+   "mean": 12.293737713203162,
+   "std": 0.09812922473232227,
+   "values": [
+    12.198388780014854,
+    12.394428973848402,
+    12.288395385746231
+   ]
+  },
+  "best_epochs": [
+   8,
+   5,
+   7
+  ],
+  "num_parameters": {
+   "total": 4635515,
+   "trainable": 3459729,
+   "encoder": 1175786
+  }
+ },
+ "examples": {
+  "good": [
+   {
+    "index": 644,
+    "class": "truck",
+    "score": 1.0,
+    "generated": "a truck is parked on the side of the road .",
+    "references": [
+     "A truck pulled over on the side of the road.",
+     "A truck is parked on the side of the road.",
+     "An old dump truck pulled over to the side of the road.",
+     "An old truck is on the side of the street parked.",
+     "An old rusted truck sitting on the side of the road."
+    ]
+   },
+   {
+    "index": 331,
+    "class": "train",
+    "score": 1.0,
+    "generated": "a train traveling down tracks next to a forest .",
+    "references": [
+     "A train is following the route of the tracks.",
+     "A train traveling through a railroad station with many lanes",
+     "A train traveling down tracks next to a forest.",
+     "The view of a train traveling down the train tracks.",
+     "a small train sitting on the tracks next to a forrest"
+    ]
+   },
+   {
+    "index": 821,
+    "class": "bus",
+    "score": 1.0,
+    "generated": "a bus is parked on the side of the road .",
+    "references": [
+     "A colorful bus is parked on the street.",
+     "Crosstown bus driver at curb waiting for his passengers.",
+     "A bus with its door open on the side of the road.",
+     "A commuter bus parked in a parking lot.",
+     "A transit bus parked at a stop on a street side."
+    ]
+   },
+   {
+    "index": 785,
+    "class": "bus",
+    "score": 1.0,
+    "generated": "a bus is parked on the side of the road .",
+    "references": [
+     "a white and black bus is driving down the street",
+     "A transit bus is parked at the side of the street.",
+     "A bus labeled \"Crosstown\" is parked on the side of the road.",
+     "A white bus is traveling down the road.",
+     "A bus that sign reads \"Crosstown\". It is a metro bus."
+    ]
+   }
+  ],
+  "bad": [
+   {
+    "index": 632,
+    "class": "airplane",
+    "score": 0.05882352963089943,
+    "generated": "a black and white photo of a black and white photo of a man and a woman",
+    "references": [
+     "two airplanes sitting on the air field another going down the runway",
+     "A plane sitting on the runway at sunset.",
+     "The twin engine airliner is being towed on the runway.",
+     "An airplane sitting on the runway at dusk.",
+     "Jet airplane parked at an airport at twilight."
+    ]
+   },
+   {
+    "index": 147,
+    "class": "airplane",
+    "score": 0.10878565907478333,
+    "generated": "a black and white cat sitting on top of a grass field .",
+    "references": [
+     "An airplane is flying in the sky at dusk.",
+     "A passenger jet that is flying in the air.",
+     "An airplane flies very high in the sky",
+     "a big airplane that is flying in sky",
+     "A large airplane flying high up in the sky."
+    ]
+   },
+   {
+    "index": 315,
+    "class": "horse",
+    "score": 0.1178511306643486,
+    "generated": "a man riding a horse drawn carriage on a city street .",
+    "references": [
+     "Horses are pulling a plow guided by cowboys",
+     "Several individuals are hanging out and enjoying their time.",
+     "Ranchers use horses to till the ground for the next crop.",
+     "two cowboys in a wagon and one cowboy standing beside some large horses",
+     "Cowboys use a large team of draft horses."
+    ]
+   },
+   {
+    "index": 808,
+    "class": "elephant",
+    "score": 0.125,
+    "generated": "a dog with a hat on its head",
+    "references": [
+     "Two elephants facing each other with trunks overlapping.",
+     "TWO ELEPHANTS FACING EACH OTHER AND LOCKING TRUNKS",
+     "Two elephants standing next to each other in the dark.",
+     "Two large elephants appear to be kissing and in love.",
+     "Two elephants touching each others trunks beside each other."
+    ]
+   }
+  ],
+  "random": [
+   {
+    "index": 44,
+    "class": "horse",
+    "score": 0.22268088161945343,
+    "generated": "a large white airplane sitting on top of a runway .",
+    "references": [
+     "A man is standing in front of joined horses",
+     "A man in winter clothing standing next to a team of draft horses.",
+     "A man in a warm winter hat and coat stands next to two white horses that have reigns and bridles on.",
+     "A man in a hat and coat next to horses",
+     "The man with blue jacked and yellow hat stands next to the white horses"
+    ]
+   },
+   {
+    "index": 37,
+    "class": "horse",
+    "score": 0.5142594575881958,
+    "generated": "a man riding a horse in front of a building .",
+    "references": [
+     "An equestrian in riding clothes jumps a horse over a post",
+     "A woman wearing a jockey outfit riding a horse that is jumping over a fence",
+     "a person jumping a horse over an object",
+     "A horse rider is leaping over barriers on her horse.",
+     "A woman riding on the back of a brown horse."
+    ]
+   },
+   {
+    "index": 675,
+    "class": "elephant",
+    "score": 0.1279633343219757,
+    "generated": "a group of elephants standing next to each other .",
+    "references": [
+     "A man looking after an elephant in some exotic country.",
+     "A man walking beneath a chained up elephant.",
+     "A man is walking under a large chained up elephant.",
+     "An elephant is held captive with heavy chains.",
+     "A man walks under a large gray elephant."
+    ]
+   },
+   {
+    "index": 775,
+    "class": "bus",
+    "score": 0.6803013682365417,
+    "generated": "a bus is parked on the side of the street .",
+    "references": [
+     "A bicyclist is riding past a bus that is parked.",
+     "A city bus is parked at the bus stop",
+     "a big yellow bus that is going down the road",
+     "City bus going down the street in an urban setting",
+     "A very long and bright colored city bus on the street."
+    ]
+   }
+  ]
+ }
+}

@@ -1,0 +1,30 @@
+human references, class mention (original / extended list): {'validation': '95.18 / 95.98', 'test': '95.38 / 96.28'}
+[cnn frozen    seed 0] BLEU-4 14.95 | mention 69.2% (ext. 69.2%) | probe acc 70.0% (epoch 3)
+[cnn frozen    seed 1] BLEU-4 13.37 | mention 68.5% (ext. 68.5%) | probe acc 70.8% (epoch 11)
+[cnn frozen    seed 2] BLEU-4 13.74 | mention 68.0% (ext. 68.0%) | probe acc 68.6% (epoch 2)
+[cnn finetuned seed 0] BLEU-4 12.63 | mention 57.4% (ext. 57.4%) | probe acc 66.7% (epoch 231)
+[cnn finetuned seed 1] BLEU-4 15.12 | mention 61.8% (ext. 61.8%) | probe acc 68.0% (epoch 21)
+[cnn finetuned seed 2] BLEU-4 14.88 | mention 63.6% (ext. 63.6%) | probe acc 68.6% (epoch 65)
+[cnn scratch   seed 0] BLEU-4 15.33 | mention 62.4% (ext. 62.4%) | probe acc 67.4% (epoch 28)
+[cnn scratch   seed 1] BLEU-4 17.25 | mention 66.8% (ext. 66.8%) | probe acc 71.2% (epoch 64)
+[cnn scratch   seed 2] BLEU-4 13.95 | mention 59.6% (ext. 59.6%) | probe acc 69.9% (epoch 114)
+[mlp frozen    seed 0] BLEU-4 8.78 | mention 29.9% (ext. 29.9%) | probe acc 28.6% (epoch 4)
+[mlp frozen    seed 1] BLEU-4 10.07 | mention 30.9% (ext. 30.9%) | probe acc 30.1% (epoch 2)
+[mlp frozen    seed 2] BLEU-4 9.64 | mention 30.3% (ext. 30.3%) | probe acc 29.1% (epoch 3)
+[mlp finetuned seed 0] BLEU-4 9.14 | mention 27.0% (ext. 27.0%) | probe acc 30.1% (epoch 4)
+[mlp finetuned seed 1] BLEU-4 9.14 | mention 25.1% (ext. 25.1%) | probe acc 28.1% (epoch 2)
+[mlp finetuned seed 2] BLEU-4 7.54 | mention 25.8% (ext. 25.8%) | probe acc 31.2% (epoch 4)
+[mlp scratch   seed 0] BLEU-4 3.72 | mention 10.0% (ext. 10.0%) | probe acc 10.0% (epoch 1)
+[mlp scratch   seed 1] BLEU-4 4.37 | mention 10.0% (ext. 10.0%) | probe acc 10.0% (epoch 1)
+[mlp scratch   seed 2] BLEU-4 7.93 | mention 10.0% (ext. 10.0%) | probe acc 10.0% (epoch 1)
+
+| encoder | mode | test BLEU-4 | class mention | class mention (ext.) | linear probe acc | classifier acc | mention if clf right / wrong |
+| cnn | frozen | 14.02 ± 0.83 | 68.6 ± 0.6 | 68.6 ± 0.6 | 69.8 ± 1.1 | 70.3 ± 1.0 | 92.9 ± 1.3 / 11.1 ± 4.4 |
+| cnn | finetuned | 14.21 ± 1.37 | 60.9 ± 3.2 | 60.9 ± 3.2 | 67.8 ± 1.0 | – | – |
+| cnn | scratch | 15.51 ± 1.66 | 62.9 ± 3.6 | 62.9 ± 3.6 | 69.5 ± 1.9 | – | – |
+| mlp | frozen | 9.50 ± 0.66 | 30.4 ± 0.5 | 30.4 ± 0.5 | 29.3 ± 0.8 | 29.7 ± 1.1 | 66.9 ± 1.7 / 14.9 ± 2.2 |
+| mlp | finetuned | 8.61 ± 0.92 | 26.0 ± 1.0 | 26.0 ± 1.0 | 29.8 ± 1.6 | – | – |
+| mlp | scratch | 5.34 ± 2.26 | 10.0 ± 0.0 | 10.0 ± 0.0 | 10.0 ± 0.0 | – | – |
+Pearson correlations over the 18 runs: {'bleu4_vs_mention': 0.946, 'probe_vs_mention': 0.992, 'probe_vs_bleu4': 0.943}
+saved /Users/psi/code/uni/deep-learning/figures/q3_3/metrics_scatter.pdf
+saved /Users/psi/code/uni/deep-learning/figures/q3_3/mention_per_class.pdf

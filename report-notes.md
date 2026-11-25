@@ -539,3 +539,118 @@ Code: `text.py` (`tokenize`, `Vocabulary`); script `python -m tasks.q3_1.text_st
 - `PadCollate` stacks the images and right-pads the captions with `pad_id` to the length of the **longest caption in the mini-batch** (`pad_sequence(..., batch_first=True)`), giving `captions (B, T)` with T varying per batch. Example (batch size 64): the first three training batches have T = 19, 23, 26; a short caption becomes `<bos> red double decker bus on a city street <eos> <pad> × 9`. Over one epoch, 41.8 % of the caption tensor entries are padding (long outlier captions make whole batches long).
 - **Ignoring padding in the loss:** with teacher forcing the decoder input is `captions[:, :-1]` and the target is `captions[:, 1:]`; the token-level cross-entropy is computed with `F.cross_entropy(..., ignore_index=pad_id)`, so positions whose target is `<pad>` contribute neither to the loss nor to the gradient, and the mean is taken over real target tokens only (each caption's `<eos>` is still a target, so the model learns when to stop). Check in the script: for random logits, appending 5 extra `<pad>` columns leaves the loss with `ignore_index` exactly unchanged (8.15563 → 8.15563), while counting pads as targets changes it (8.16371 → 8.15813). Perplexity = exp(mean loss over real tokens).
 - The decoder's outputs at padded input positions are computed but ignored; since padding is on the right, a unidirectional RNN never reads a `<pad>` before a real token, so padding cannot influence the predictions of real tokens.
+
+## Q3.2 An RNN captioner
+
+Code: `models.Captioner`, `captioning.py` (training, losses, decoding, metrics; results saved like Part 2); script `python -m tasks.q3_2.captioner` (summary in `results/q3_2/summary.json`, log in `results/q3_2/log.txt`, figures `figures/q3_2/curves.pdf`, `figures/q3_2/examples.pdf`).
+
+**Model** (`models.Captioner`)
+- **Encoder:** the selected CNN of Q2.5 (4 blocks × 2 conv, 32–256 channels), **pretrained on classification** (the 50-epoch checkpoints `q2_5/cnn_best_50ep`, same seed as the captioner) and **frozen** (no gradients, always in eval mode so BatchNorm uses its running statistics). Image vector f = the 256-d globally average-pooled features (`CNN.features`), i.e. the input of the classification layer.
+- **Feeding the image to the decoder:** h₀ = tanh(W_h f + b) initializes the GRU state; in the selected configuration (`concat_image`) a second projection W_x f (256-d) is also concatenated to the word embedding at **every** time step.
+- **Decoder:** word embedding (2,193 × 256, `padding_idx` = `<pad>`), one-layer GRU (hidden 512), dropout 0.3 on embeddings and GRU outputs, linear layer to the 2,193-word vocabulary.
+- Parameters: 4,635,515 in total, of which 3,459,729 trainable (decoder) and 1,175,786 in the frozen encoder.
+
+**Training**
+- Teacher forcing: input `<bos> w₁ … w_n`, target `w₁ … w_n <eos>`; token-level cross-entropy with `ignore_index = <pad>` (3.1); Adam, lr 1e-3, batch size 64 (image–caption pairs), gradient-norm clipping at 5, at most 20 epochs, early stopping on **validation loss** with patience 4, best epoch restored (provided `train` loop; `val_score_fn` = − validation loss).
+- Greedy decoding: start with `<bos>`, take the arg-max word at every step, stop at `<eos>` or after 25 tokens (99 % of reference captions have ≤ 20 tokens; no generated caption reached the limit).
+- BLEU-4: corpus-level (`metrics.bleu4`), one generated caption per image (1,000 val / 1,000 test images) against its 5 reference captions, all tokenized with our tokenizer (lowercase, punctuation as tokens).
+- Hardware: Apple GPU (MPS); one epoch ≈ 55 s with the frozen CNN. Frozen-encoder runs on MPS were bit-reproducible.
+
+**Decoder search** (seed 0, frozen CNN encoder; one change at a time w.r.t. the base; selection by validation BLEU-4)
+
+| Trial | Val loss (ppl) | Val BLEU-4 | Test BLEU-4 | Test class mention | Best epoch |
+|---|---|---|---|---|---|
+| base (h₀ only, dropout 0.3, lr 1e-3, hidden 512) | 2.480 (11.9) | 13.83 | 12.02 | 66.3 % | 6 |
+| **concat_image** (image also at every step) | 2.475 (11.9) | **15.01** | 14.95 | 69.2 % | 8 |
+| dropout 0.5 | 2.498 (12.2) | 14.55 | 14.06 | 69.2 % | 14 |
+| lr 3e-4 | **2.450 (11.6)** | 13.91 | 13.68 | 67.8 % | 18 |
+| hidden 256 | 2.469 (11.8) | 13.14 | 14.11 | 68.9 % | 15 |
+
+- All trials are within ~2 BLEU points with 1 seed, about the seed-to-seed spread (± 0.7–0.8, see below), so the choice is not strongly supported; concat_image is also the variant motivated by the architecture (the image information cannot fade over the sequence).
+- **Validation loss and BLEU rank the trials differently** (lr 3e-4 has the best perplexity but only average BLEU). Lower perplexity = better probability for the reference words under teacher forcing; BLEU measures the single greedy caption. They are related but not the same objective.
+
+**Selected captioner, 3 seeds** (`results/q3_2/final/`)
+
+| Split | Loss (cross-entropy / token) | Perplexity | BLEU-4 | Class mention | Mean length |
+|---|---|---|---|---|---|
+| Train (eval mode) | 1.940 ± 0.091 | 6.98 | – | – | – |
+| Validation | 2.480 ± 0.006 | 11.94 ± 0.07 | **14.91 ± 0.72** | 70.9 % | 10.95 |
+| Test | 2.509 ± 0.008 | 12.29 ± 0.10 | **14.02 ± 0.83** | 68.6 % | 10.96 |
+
+Per seed (val / test BLEU-4): 15.01 / 14.95, 14.15 / 13.37, 15.58 / 13.74; best epochs 8, 5, 7.
+
+**Loss and perplexity curves** (`figures/q3_2/curves.pdf`; dashed = training loss averaged over the epoch with dropout on, solid = validation loss in eval mode)
+- Validation loss drops quickly (2.70 → 2.50 in 4 epochs) and then flattens; its minimum is at epoch 5–8 (val ppl ≈ 11.9), after which it rises slowly while the training loss keeps falling (2.04 at epoch 12, ppl 7.7): **overfitting starts after ~6 epochs**. The train/val gap at the restored epoch is large (eval-mode train loss 1.94 vs val 2.48).
+- In epoch 1 the training loss (3.17) is above the validation loss (2.71) only because it is averaged over the epoch while the model is still learning (and with dropout).
+- The seeds behave almost identically (val loss ± 0.006).
+
+**Generated captions** (`figures/q3_2/examples.pdf`: 12 test images, seed 0; 4 best and 4 worst by a smoothed sentence-level BLEU-2 used only for picking, 4 random; each with the generated caption and one reference; all 5 references in the log)
+- Good: "a truck is parked on the side of the road ." (exactly a reference), "a train traveling down tracks next to a forest ." (exactly a reference), "a bus is parked on the side of the road ." (two images).
+- Random: horse with man and draft horses → "a large white airplane sitting on top of a runway ." (wrong class); show jumping → "a man riding a horse in front of a building ." (right class, plausible but generic); man under chained elephant → "a group of elephants standing next to each other ." (right class, wrong count/scene); city bus → "a bus is parked on the side of the street ." (correct).
+- Bad: airplane at dusk → "a black and white photo of a black and white photo of a man and a woman" (wrong class, repetition); airplane in the sky → "a black and white cat sitting on top of a grass field ." (wrong class); horses pulling a plow → "a man riding a horse drawn carriage on a city street ." (right class, wrong scene); two elephants in the dark → "a dog with a hat on its head".
+
+**Typical errors** (test, seed 0, quantified)
+- **Generic, template-like captions** (mode collapse to frequent training sentences): only 439 of 1,000 test captions are distinct (398 and 409 for the other seeds); the most frequent are "a bus is parked on the side of the road ." (36×), "a train traveling down tracks next to a forest ." (25×), "a man riding a motorcycle down a street ." (24×). 14–20 % of the generated captions are copies of a training caption. Greedy decoding picks the most probable continuation at each step, which favours the most common phrasing of each class.
+- **Wrong class:** the caption mentions the correct class in 68.6 % of the test images (human references: 95.4 %). Per class (seed 0): motorcycle 90 %, cat 79 %, airplane 78 %, giraffe 78 %, bus 73 %, elephant 70 %, train 65 %, horse 60 %, dog 47 %, truck 46 %. The wrong class is usually a visually similar one, the same pairs as in the Q2.5 confusion matrix: dog → cat (36 %), truck → bus (17 %) / motorcycle (11 %) / train (8 %), cat → dog (14 %), train → truck (12 %). So the captioner's class errors largely inherit the encoder's classification errors.
+- **Right class, wrong details:** counts ("a group of elephants" for one elephant), actions and scenes ("horse drawn carriage on a city street" for a plough in a field), colours; details like "chained", "jumping", "at dusk" are never produced (they are rare in the training captions and need fine visual information that a 256-d pooled vector of a 64×64 image does not keep).
+- **Repetition:** 55/1,000 captions repeat a bigram ("a black and white photo of a black and white photo of …"), a typical failure of greedy RNN decoding once the state no longer tracks what was already said.
+- **`<unk>`:** 0.43 % of the generated test tokens (seed 0) are `<unk>`; it can be generated because `<unk>` is a target in the training captions (2 % of the tokens).
+- **Low diversity:** the 1,000 test captions (seed 0) use only 195 distinct words and 559 distinct bigrams (vocabulary: 2,189 words). Compared again in 3.4 (beam search).
+
+## Q3.3 Encoders and class mention
+
+Code: `tasks/q3_3/encoders.py` (3.3 a; log `results/q3_3/log.txt`, summary `results/q3_3/encoders.json`), `tasks/q3_3/class_mention.py` (3.3 b; log `results/q3_3/class_mention_log.txt`, `results/q3_3/class_mention.json`, figures `figures/q3_3/metrics_scatter.pdf`, `figures/q3_3/mention_per_class.pdf`).
+
+### (a) MLP vs CNN encoder, frozen vs jointly trained
+
+**Setup.** 2 encoders × 3 training modes × 3 seeds = 18 captioners, all with the decoder selected in Q3.2 (concat_image, GRU 512, dropout 0.3, Adam lr 1e-3, batch 64, ≤ 20 epochs, early stopping on val loss with patience 4). Same budget for all.
+- Encoders: the selected CNN of Q2.5 (256-d image vector, 1.18 M params) and the selected MLP of Q2.2 (image vector = last hidden layer, 1024-d, 13.6 M params). Pretrained = the Part 2 classifier with the same seed.
+- **frozen:** pretrained, not updated (frozen CNN = the Q3.2 runs, copied). **finetuned:** pretrained, trained jointly with the decoder, encoder lr 1e-4 (10× smaller than the decoder, to not destroy the pretrained features in the first steps). **scratch:** random init, trained jointly (lr 1e-3), only from the caption loss.
+- Jointly trained runs on MPS are not bit-reproducible (small run-to-run differences); frozen runs are.
+
+| Encoder | Mode | Params (trainable) | Val BLEU-4 | **Test BLEU-4** | Test class mention | Val ppl | Test ppl | Best epochs | s / epoch |
+|---|---|---|---|---|---|---|---|---|---|
+| CNN | frozen | 4.64 M (3.46 M) | 14.91 ± 0.72 | 14.02 ± 0.83 | **68.6 ± 0.6 %** | 11.94 ± 0.07 | 12.29 | 8, 5, 7 | 38 |
+| CNN | finetuned | 4.64 M (4.64 M) | 15.29 ± 1.70 | 14.21 ± 1.37 | 60.9 ± 3.2 % | 12.64 ± 0.08 | 13.01 | 4, 4, 4 | 104 |
+| CNN | scratch | 4.64 M (4.64 M) | 15.72 ± 1.56 | **15.51 ± 1.66** | 62.9 ± 3.6 % | **11.27 ± 0.12** | 11.51 | 6, 9, 4 | 232 |
+| MLP | frozen | 17.69 M (4.05 M) | 10.39 ± 0.70 | 9.50 ± 0.66 | 30.4 ± 0.5 % | 13.59 ± 0.39 | 13.87 | 3, 4, 4 | 20 |
+| MLP | finetuned | 17.69 M (17.69 M) | 9.90 ± 1.06 | 8.61 ± 0.92 | 26.0 ± 1.0 % | 12.46 ± 0.06 | 12.72 | 6, 7, 8 | 34 |
+| MLP | scratch | 17.69 M (17.69 M) | 5.15 ± 2.15 | 5.34 ± 2.26 | 10.0 ± 0.0 % | 12.88 ± 0.02 | 13.05 | 7, 6, 7 | 126 |
+
+(mean ± std over seeds 0, 1, 2; class mention with the original `CLASS_SYNONYMS`; classification test accuracy of the pretrained encoders: CNN 70.27 ± 1.00 %, MLP 29.67 ± 1.07 %.)
+
+**Findings**
+- **The encoder architecture matters most:** every CNN captioner beats every MLP captioner by ~5–10 BLEU points and ~30–50 points of class mention. Frozen CNN vs frozen MLP: +4.5 BLEU (2·SE ≈ 1.2), +38 points mention. The MLP has 4× more encoder parameters, so this is the inductive bias of Q2.4/2.5 (locality, weight sharing, pooling), not capacity.
+- **CNN, frozen vs jointly trained: no significant BLEU difference.** Scratch has the highest mean (15.51) but the difference to frozen (+1.5) is below 2·SE ≈ 2.1; finetuned is equal to frozen (+0.2). Joint training makes runs much less stable (BLEU std 1.4–1.7 vs 0.8) and 3–6× slower per epoch.
+- **But joint training lowers class mention** (frozen 68.6 % vs finetuned 60.9 % and scratch 62.9 %; differences 7.6 and 5.7 points, above 2·SE ≈ 3.7 / 4.2): the frozen encoder keeps the class information it was trained for; jointly trained encoders optimize the caption loss, which rewards generic wording ("a man riding …") as much as the class word.
+- **Finetuning overfits fastest:** best epoch 4 in all seeds, val ppl 12.64 is *worse* than frozen (11.94). With all 4.6 M parameters trainable on 10 k images (50 k captions), the encoder adapts to the training captions; a smaller encoder lr or freezing the first blocks would be the next things to try.
+- **The CNN trained from scratch learns a classifier from captions alone:** its linear-probe accuracy (69.5 ± 1.9 %, see b) equals the pretrained classifier (70.3 %). The captions name the class in 95 % of the cases, so the caption loss contains the class signal, plus extra signal (scene, actions). It also reaches the lowest perplexity (11.27) — but its captions are less diverse (203–388 distinct test captions vs 398–439 frozen).
+- **MLP from scratch collapses completely:** all 1024 encoder features are 0 for every image (dead ReLUs: lr 1e-3 on a randomly initialized 13.6 M MLP), so the decoder ignores the image and generates **one fixed caption for all 1,000 test images** (seed 0: "a man riding a motorcycle with a woman on back of it .", seed 1: "a large elephant standing in a field …", seed 2: "a man is standing next to a motorcycle ."). Class mention exactly 10 % (= one class), BLEU depends on which sentence it picks (3.7–7.9). It is a pure language model, and still has test ppl 13.05 — **lower than the frozen MLP captioner (13.87)**: the frozen MLP features help BLEU (+4) but not perplexity, because the decoder overfits to the 1024-d features within 3–4 epochs.
+- **MLP finetuned** has better perplexity than frozen (12.46 vs 13.59) but worse BLEU (8.6 vs 9.5) and the least diverse captions (95–146 distinct). Again: perplexity and BLEU disagree (see Q3.2).
+
+### (b) Class mention accuracy and classification accuracy
+
+**Classification accuracy of each encoder.** Only the pretrained encoders have a trained classification layer, so for all 18 encoders we additionally train a **linear probe** (softmax regression on the standardized, frozen image vectors of the training images; full-batch Adam lr 1e-2, wd 1e-4, 300 epochs, epoch selected by val accuracy; test accuracy reported). For the frozen encoders the probe matches the classifier (CNN 69.8 vs 70.3 %, MLP 29.3 vs 29.7 %), so it is a fair measure of "how much class information is in the image vector".
+
+**Extended synonym list** (our extension, `metrics.py` unchanged): possessives ("dog's", one token in our tokenizer) and frequent class words in the training captions (biplane; retriever, husky, shepherd, collie, terrier; horseback; motorcyclist; subway, trolley, tram; firetruck, pickup). Human references: 95.4 → 96.3 % (test). **Generated captions: no change at all** (identical to the original list for all 18 runs) — the captioners never produce these rarer words, they always use the most frequent class word.
+
+| Encoder | Mode | Test BLEU-4 | Class mention | Linear-probe acc | Classifier acc | Mention when classifier right / wrong |
+|---|---|---|---|---|---|---|
+| CNN | frozen | 14.02 ± 0.83 | 68.6 ± 0.6 % | 69.8 ± 1.1 % | 70.3 ± 1.0 % | 92.9 ± 1.3 % / 11.1 ± 4.4 % |
+| CNN | finetuned | 14.21 ± 1.37 | 60.9 ± 3.2 % | 67.8 ± 1.0 % | – | – |
+| CNN | scratch | 15.51 ± 1.66 | 62.9 ± 3.6 % | 69.5 ± 1.9 % | – | – |
+| MLP | frozen | 9.50 ± 0.66 | 30.4 ± 0.5 % | 29.3 ± 0.8 % | 29.7 ± 1.1 % | 66.9 ± 1.7 % / 14.9 ± 2.2 % |
+| MLP | finetuned | 8.61 ± 0.92 | 26.0 ± 1.0 % | 29.8 ± 1.6 % | – | – |
+| MLP | scratch | 5.34 ± 2.26 | 10.0 ± 0.0 % | 10.0 ± 0.0 % | – | – |
+
+**Does a better classifier make a better captioner?**
+- **Across encoders: yes, clearly.** Over the 18 runs, Pearson r = 0.99 (probe acc vs class mention), 0.94 (probe acc vs BLEU-4), 0.95 (class mention vs BLEU-4); see `figures/q3_3/metrics_scatter.pdf`. For the frozen captioners, class mention ≈ classification accuracy (68.6 vs 70.3 %, 30.4 vs 29.7 %).
+- **But this is a between-group effect.** Within the CNN captioners (9 runs, probe acc 66.7–71.2 %), the correlations are weak (probe–mention r = 0.65, probe–BLEU r = 0.39, mention–BLEU r = 0.30); within the MLP frozen/finetuned runs, probe–BLEU is even negative (−0.41). Once the encoder is "good enough" (~70 %), small differences in classification accuracy do not predict BLEU; the decoder, the training mode and seed noise matter as much. The jointly trained CNNs show this directly: same probe accuracy as frozen (68–70 %), lower mention, equal or higher BLEU.
+- **Image level (frozen encoders): the caption follows the classifier.** When the CNN classifier is right, the caption names the right class in 92.9 % of the images; when it is wrong, only in 11.1 %. When it is wrong, the caption names the **classifier's (wrong) predicted class** in 73–80 % of the images (MLP: 43–55 %). So the frozen captioner essentially "reads out" the class from the image vector and writes a typical sentence for that class; its class errors are the classifier's errors (cf. the confusion pairs dog ↔ cat, truck → bus in Q3.2).
+- **Per class** (`figures/q3_3/mention_per_class.pdf`): the CNN captioners are best on motorcycle, giraffe, cat, airplane (≥ 75 %) and worst on dog and truck (25–50 %), the classes the CNN classifier confuses most (Q2.5). Jointly trained CNNs lose most on truck (50 → 25/35 %), elephant (scratch), motorcycle and cat (finetuned). The MLP captioners name only motorcycle/cat/airplane reasonably often.
+
+**What each metric captures**
+- **Classification accuracy (classifier / linear probe):** how much *class* information the image vector contains, independent of language.
+- **Class mention accuracy:** whether that information reaches the caption (one keyword); it ignores everything else in the sentence and gives no credit for synonyms outside the list (small effect here, see above).
+- **BLEU-4:** n-gram overlap with 5 references, i.e. wording, scene and fluency; the class word is only one of ~11 tokens, so a caption with the right class but generic wording can still score low and a fluent caption of a frequent template can score well (the MLP-scratch "language model" gets BLEU 3.7–7.9 with 10 % mention).
+- **Perplexity:** how probable the reference captions are under the model with teacher forcing; it measures the language model plus image conditioning, and can be good without image information (MLP scratch 13.05 < MLP frozen 13.87). None of these metrics alone says whether a caption is correct; they agree across very different encoders but disagree within a family.

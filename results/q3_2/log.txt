@@ -1,0 +1,92 @@
+== 1. decoder search (frozen CNN encoder, seed 0) ==
+[base         ] val loss 2.480 (ppl 11.9) | BLEU-4 val 13.83 test 12.02 | class mention test 66.3% | len 10.8 | best epoch 6
+[concat_image ] val loss 2.475 (ppl 11.9) | BLEU-4 val 15.01 test 14.95 | class mention test 69.2% | len 10.9 | best epoch 8
+[dropout_0.5  ] val loss 2.498 (ppl 12.2) | BLEU-4 val 14.55 test 14.06 | class mention test 69.2% | len 11.1 | best epoch 14
+[lr_3e-4      ] val loss 2.450 (ppl 11.6) | BLEU-4 val 13.91 test 13.68 | class mention test 67.8% | len 11.0 | best epoch 18
+[hidden_256   ] val loss 2.469 (ppl 11.8) | BLEU-4 val 13.14 test 14.11 | class mention test 68.9% | len 11.0 | best epoch 15
+selected by validation BLEU-4: concat_image (15.01)
+
+== 2. selected configuration with 3 seeds ==
+  seed 0: val loss 2.475 (ppl 11.9) | BLEU-4 val 15.01 test 14.95 | class mention test 69.2% | len 10.9 | best epoch 8
+  seed 1: val loss 2.487 (ppl 12.0) | BLEU-4 val 14.15 test 13.37 | class mention test 68.5% | len 10.9 | best epoch 5
+  seed 2: val loss 2.479 (ppl 11.9) | BLEU-4 val 15.58 test 13.74 | class mention test 68.0% | len 11.1 | best epoch 7
+validation BLEU-4 14.91 ± 0.72 | loss 2.480 ± 0.006 | perplexity 11.94 ± 0.07 | class mention 70.9% | mean length 10.95
+test       BLEU-4 14.02 ± 0.83 | loss 2.509 ± 0.008 | perplexity 12.29 ± 0.10 | class mention 68.6% | mean length 10.96
+train      loss 1.940 ± 0.091 | perplexity 6.98 (eval mode, no dropout)
+parameters: {'total': 4635515, 'trainable': 3459729, 'encoder': 1175786}
+saved /Users/psi/code/uni/deep-learning/figures/q3_2/curves.pdf
+
+== 3. example captions (seed 0, test) ==
+[good  ] #644 truck      score 1.00 | gen: a truck is parked on the side of the road .
+                                    ref: A truck pulled over on the side of the road.
+                                    ref: A truck is parked on the side of the road.
+                                    ref: An old dump truck pulled over to the side of the road.
+                                    ref: An old truck is on the side of the street parked.
+                                    ref: An old rusted truck sitting on the side of the road.
+[good  ] #331 train      score 1.00 | gen: a train traveling down tracks next to a forest .
+                                    ref: A train is following the route of the tracks.
+                                    ref: A train traveling through a railroad station with many lanes
+                                    ref: A train traveling down tracks next to a forest.
+                                    ref: The view of a train traveling down the train tracks.
+                                    ref: a small train sitting on the tracks next to a forrest
+[good  ] #821 bus        score 1.00 | gen: a bus is parked on the side of the road .
+                                    ref: A colorful bus is parked on the street.
+                                    ref: Crosstown bus driver at curb waiting for his passengers.
+                                    ref: A bus with its door open on the side of the road.
+                                    ref: A commuter bus parked in a parking lot.
+                                    ref: A transit bus parked at a stop on a street side.
+[good  ] #785 bus        score 1.00 | gen: a bus is parked on the side of the road .
+                                    ref: a white and black bus is driving down the street
+                                    ref: A transit bus is parked at the side of the street.
+                                    ref: A bus labeled "Crosstown" is parked on the side of the road.
+                                    ref: A white bus is traveling down the road.
+                                    ref: A bus that sign reads "Crosstown". It is a metro bus.
+[random] # 44 horse      score 0.22 | gen: a large white airplane sitting on top of a runway .
+                                    ref: A man is standing in front of joined horses
+                                    ref: A man in winter clothing standing next to a team of draft horses.
+                                    ref: A man in a warm winter hat and coat stands next to two white horses that have reigns and bridles on.
+                                    ref: A man in a hat and coat next to horses
+                                    ref: The man with blue jacked and yellow hat stands next to the white horses
+[random] # 37 horse      score 0.51 | gen: a man riding a horse in front of a building .
+                                    ref: An equestrian in riding clothes jumps a horse over a post
+                                    ref: A woman wearing a jockey outfit riding a horse that is jumping over a fence
+                                    ref: a person jumping a horse over an object
+                                    ref: A horse rider is leaping over barriers on her horse.
+                                    ref: A woman riding on the back of a brown horse.
+[random] #675 elephant   score 0.13 | gen: a group of elephants standing next to each other .
+                                    ref: A man looking after an elephant in some exotic country.
+                                    ref: A man walking beneath a chained up elephant.
+                                    ref: A man is walking under a large chained up elephant.
+                                    ref: An elephant is held captive with heavy chains.
+                                    ref: A man walks under a large gray elephant.
+[random] #775 bus        score 0.68 | gen: a bus is parked on the side of the street .
+                                    ref: A bicyclist is riding past a bus that is parked.
+                                    ref: A city bus is parked at the bus stop
+                                    ref: a big yellow bus that is going down the road
+                                    ref: City bus going down the street in an urban setting
+                                    ref: A very long and bright colored city bus on the street.
+[bad   ] #632 airplane   score 0.06 | gen: a black and white photo of a black and white photo of a man and a woman
+                                    ref: two airplanes sitting on the air field another going down the runway
+                                    ref: A plane sitting on the runway at sunset.
+                                    ref: The twin engine airliner is being towed on the runway.
+                                    ref: An airplane sitting on the runway at dusk.
+                                    ref: Jet airplane parked at an airport at twilight.
+[bad   ] #147 airplane   score 0.11 | gen: a black and white cat sitting on top of a grass field .
+                                    ref: An airplane is flying in the sky at dusk.
+                                    ref: A passenger jet that is flying in the air.
+                                    ref: An airplane flies very high in the sky
+                                    ref: a big airplane that is flying in sky
+                                    ref: A large airplane flying high up in the sky.
+[bad   ] #315 horse      score 0.12 | gen: a man riding a horse drawn carriage on a city street .
+                                    ref: Horses are pulling a plow guided by cowboys
+                                    ref: Several individuals are hanging out and enjoying their time.
+                                    ref: Ranchers use horses to till the ground for the next crop.
+                                    ref: two cowboys in a wagon and one cowboy standing beside some large horses
+                                    ref: Cowboys use a large team of draft horses.
+[bad   ] #808 elephant   score 0.12 | gen: a dog with a hat on its head
+                                    ref: Two elephants facing each other with trunks overlapping.
+                                    ref: TWO ELEPHANTS FACING EACH OTHER AND LOCKING TRUNKS
+                                    ref: Two elephants standing next to each other in the dark.
+                                    ref: Two large elephants appear to be kissing and in love.
+                                    ref: Two elephants touching each others trunks beside each other.
+saved /Users/psi/code/uni/deep-learning/figures/q3_2/examples.pdf

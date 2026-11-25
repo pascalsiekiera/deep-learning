@@ -1,0 +1,27 @@
+[mlp frozen    seed 0] val loss 2.641 (ppl 14.0) | BLEU-4 val 9.63 test 8.78 | class mention test 29.9% | len 11.0 | best epoch 3
+[mlp frozen    seed 1] val loss 2.589 (ppl 13.3) | BLEU-4 val 11.00 test 10.07 | class mention test 30.9% | len 10.9 | best epoch 4
+[mlp frozen    seed 2] val loss 2.596 (ppl 13.4) | BLEU-4 val 10.54 test 9.64 | class mention test 30.3% | len 10.5 | best epoch 4
+[cnn frozen    seed 0] val loss 2.475 (ppl 11.9) | BLEU-4 val 15.01 test 14.95 | class mention test 69.2% | len 10.9 | best epoch 8
+[cnn frozen    seed 1] val loss 2.487 (ppl 12.0) | BLEU-4 val 14.15 test 13.37 | class mention test 68.5% | len 10.9 | best epoch 5
+[cnn frozen    seed 2] val loss 2.479 (ppl 11.9) | BLEU-4 val 15.58 test 13.74 | class mention test 68.0% | len 11.1 | best epoch 7
+[cnn finetuned seed 0] val loss 2.545 (ppl 12.7) | BLEU-4 val 13.33 test 12.63 | class mention test 57.4% | len 11.3 | best epoch 4
+[cnn finetuned seed 1] val loss 2.534 (ppl 12.6) | BLEU-4 val 16.14 test 15.12 | class mention test 61.8% | len 10.7 | best epoch 4
+[cnn finetuned seed 2] val loss 2.532 (ppl 12.6) | BLEU-4 val 16.40 test 14.88 | class mention test 63.6% | len 10.9 | best epoch 4
+[mlp finetuned seed 0] val loss 2.528 (ppl 12.5) | BLEU-4 val 9.90 test 9.14 | class mention test 27.0% | len 10.8 | best epoch 6
+[mlp finetuned seed 1] val loss 2.517 (ppl 12.4) | BLEU-4 val 10.96 test 9.14 | class mention test 25.1% | len 10.8 | best epoch 7
+[mlp finetuned seed 2] val loss 2.522 (ppl 12.5) | BLEU-4 val 8.84 test 7.54 | class mention test 25.8% | len 11.1 | best epoch 8
+[cnn scratch   seed 0] val loss 2.417 (ppl 11.2) | BLEU-4 val 14.21 test 15.33 | class mention test 62.4% | len 11.0 | best epoch 6
+[cnn scratch   seed 1] val loss 2.416 (ppl 11.2) | BLEU-4 val 17.32 test 17.25 | class mention test 66.8% | len 10.8 | best epoch 9
+[cnn scratch   seed 2] val loss 2.434 (ppl 11.4) | BLEU-4 val 15.62 test 13.95 | class mention test 59.6% | len 11.0 | best epoch 4
+[mlp scratch   seed 0] val loss 2.555 (ppl 12.9) | BLEU-4 val 3.10 test 3.72 | class mention test 10.0% | len 13.0 | best epoch 7
+[mlp scratch   seed 1] val loss 2.557 (ppl 12.9) | BLEU-4 val 4.94 test 4.37 | class mention test 10.0% | len 12.0 | best epoch 6
+[mlp scratch   seed 2] val loss 2.555 (ppl 12.9) | BLEU-4 val 7.39 test 7.93 | class mention test 10.0% | len 9.0 | best epoch 7
+
+| encoder | mode | params total | trainable | val BLEU-4 | test BLEU-4 | test class mention | val ppl | train loss | mean len | best epochs |
+| cnn | frozen | 4,635,515 | 3,459,729 | 14.91 ± 0.72 | 14.02 ± 0.83 | 68.57 ± 0.60 | 11.94 ± 0.07 | 1.94 ± 0.09 | 10.96 | [8, 5, 7] |
+| cnn | finetuned | 4,635,515 | 4,635,515 | 15.29 ± 1.70 | 14.21 ± 1.37 | 60.93 ± 3.19 | 12.64 ± 0.08 | 2.07 ± 0.01 | 10.96 | [4, 4, 4] |
+| cnn | scratch | 4,635,515 | 4,635,515 | 15.72 ± 1.56 | 15.51 ± 1.66 | 62.93 ± 3.63 | 11.27 ± 0.12 | 1.97 ± 0.19 | 10.91 | [6, 9, 4] |
+| mlp | frozen | 17,693,339 | 4,049,553 | 10.39 ± 0.70 | 9.50 ± 0.66 | 30.37 ± 0.50 | 13.59 ± 0.39 | 2.09 ± 0.06 | 10.81 | [3, 4, 4] |
+| mlp | finetuned | 17,693,339 | 17,693,339 | 9.90 ± 1.06 | 8.61 ± 0.92 | 25.97 ± 0.96 | 12.46 ± 0.06 | 2.01 ± 0.05 | 10.92 | [6, 7, 8] |
+| mlp | scratch | 17,693,339 | 17,693,339 | 5.15 ± 2.15 | 5.34 ± 2.26 | 10.00 ± 0.00 | 12.88 ± 0.02 | 2.14 ± 0.04 | 11.33 | [7, 6, 7] |
+classification test accuracy of the pretrained encoders: {'cnn': '70.27 ± 1.00', 'mlp': '29.67 ± 1.07'}
