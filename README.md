@@ -35,6 +35,7 @@ earlier ones):
 | Q3.3 | `python -m tasks.q3_3.class_mention` | class mention vs classification accuracy (linear probes), correlations, per-class plot | 5 min |
 | Q3.4 | `python -m tasks.q3_4.decoding` | greedy vs beam search (beam 1, 3, 5, 10; with and without length normalization) | 5 min |
 | Q4.1 | `python -m tasks.q4_1.transformer` | Transformer captioner: search (5 trials), 3 seeds, comparison with the RNN (greedy and beam 5, timing), cross-attention maps | 1.5 h |
+| Q4.2 | `python -m tasks.q4_2.pretrained` | pretrained frozen encoders (ResNet-50 ImageNet, CLIP ViT-B/32) with our GRU and Transformer decoders (3 seeds each), linear probes, encoder cost, examples, CLIP attention; needs `transformers` and downloads the pretrained weights | 1.5 h |
 
 \* On an Apple M2 laptop (8 GB RAM); MLPs on the CPU, CNNs and all captioners on the Apple GPU (MPS). With a CUDA
 GPU everything uses the GPU.
@@ -59,6 +60,7 @@ GPU everything uses the GPU.
 | `models.py` | `MLP` (configurable depth, width, activation, dropout; no hidden layer = linear baseline) and `CNN` (VGG-style blocks of 3×3 conv, BatchNorm, ReLU, max pooling; global average pooling), both with `features()` for the image vector; `Captioner` (encoder + GRU decoder, image vector as initial state and optionally at every step) and `TransformerCaptioner` (own pre-LN decoder blocks with causal self-attention and cross-attention to the 8×8 CNN feature grid); greedy decoding and beam search shared by both (`CaptionDecoding`) |
 | `text.py` | tokenizer (lowercase, words and punctuation as tokens) and `Vocabulary` (frequency threshold, `<pad>`, `<bos>`, `<eos>`, `<unk>`) |
 | `captioning.py` | Part 3 helpers: building a captioner from a config dict (encoder from Part 2, frozen or trained jointly), teacher-forcing loss with `ignore_index=<pad>`, perplexity, caption generation, caption metrics, `caption_run` (train and evaluate one config with one seed and save the result) |
+| `pretrained.py` | Part 4.2: pretrained encoders (ResNet-50 from torchvision, CLIP image encoder from Hugging Face `transformers`), feature extraction for all images (cached in `checkpoints/q4_2/`), and `CachedEncoder`, which looks the frozen features up during training |
 | `common.py` | shared helpers: building models/optimizers/schedulers from a config dict, data loaders with per-channel normalization, `run` (train one config with one seed and save the result), evaluation, image shifts and border controls, pixel permutation, confusion matrices, plots |
 | `tasks/qX_Y/` | one folder per question with the scripts above |
 | `results/qX_Y/` | all run results (JSON), summaries and logs |
@@ -74,7 +76,7 @@ captioners is done in `common.run_device` and `captioning.device_for_captioning`
 `train.py`. The tokenizer, vocabulary, captioner, and greedy and beam search decoding are our own
 code (`text.py`, `models.py`, `captioning.py`). Our extended class synonym list for Q3.3 (b) is
 defined in `tasks/q3_3/class_mention.py`, not in `metrics.py`.
-No `numpy` is used.
+No `numpy` is used. Part 4.2 uses pretrained weights and `transformers`, which the project allows for Part 4 only.
 
 ## Provided skeleton code
 

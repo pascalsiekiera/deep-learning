@@ -30,7 +30,8 @@ ENCODER_RUNS = {"cnn": "q2_5/cnn_best_50ep", "mlp": "q2_2/mlp_best"}
 
 CAP_DEFAULTS = {
     # encoder
-    "encoder": "cnn",          # "cnn" or "mlp" (architecture of ENCODER_RUNS[encoder])
+    "encoder": "cnn",          # "cnn" or "mlp" (architecture of ENCODER_RUNS[encoder]); Part 4.2:
+                               # "resnet50" or "clip" (pretrained.py, always pretrained and frozen)
     "pretrained": True,        # start from the classifier trained in Part 2 (same seed)
     "freeze": True,            # keep the encoder fixed; False = train it jointly with the decoder
     # decoder
@@ -95,11 +96,16 @@ def device_for_captioning():
 def build_captioner(config, seed):
     """The captioner of `config`. The encoder has the architecture of ENCODER_RUNS[encoder]; with
     pretrained=True its weights are the Part 2 classifier trained with the same seed."""
-    run = ENCODER_RUNS[config["encoder"]]
-    if config["pretrained"]:
+    if config["encoder"] in ("resnet50", "clip"):        # Part 4.2: frozen pretrained encoders
+        if not (config["pretrained"] and config["freeze"]):
+            raise ValueError("resnet50 / clip encoders are only used pretrained and frozen")
+        from pretrained import cached_encoder
+        encoder = cached_encoder(config["encoder"])
+    elif config["pretrained"]:
+        run = ENCODER_RUNS[config["encoder"]]
         encoder = load_model(run, seed)
     else:
-        encoder = build_model(full_config(load_results(run)[0]["config"]))
+        encoder = build_model(full_config(load_results(ENCODER_RUNS[config["encoder"]])[0]["config"]))
     vocab = get_vocab(config["min_count"])
     if config.get("decoder") == "transformer":
         return TransformerCaptioner(encoder, len(vocab), vocab.pad_id, vocab.bos_id, vocab.eos_id,

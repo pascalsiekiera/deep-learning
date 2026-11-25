@@ -16,6 +16,7 @@ Protocol (as in Q3.2)
   4. Cross-attention over the image regions for a few generated captions.
 
     python -m tasks.q4_1.transformer
+    python -m tasks.q4_1.transformer --report-figure     # figures/q4_1/attention_report.pdf
 
 Writes results/q4_1/..., figures/q4_1/{curves,attention_*}.pdf.
 """
@@ -70,9 +71,9 @@ def decode_eval(model, split, beam):
     return m, caps
 
 
-def evaluate_runs(name):
-    """Greedy and beam-search metrics of results/<name>/seed<k> (cached in results/q4_1/)."""
-    path = os.path.join(OUT, "decoding", name.replace("/", "_") + ".json")
+def evaluate_runs(name, out_dir=OUT):
+    """Greedy and beam-search metrics of results/<name>/seed<k> (cached in <out_dir>/decoding/)."""
+    path = os.path.join(out_dir, "decoding", name.replace("/", "_") + ".json")
     if os.path.exists(path):
         with open(path) as f:
             return json.load(f)
@@ -117,7 +118,7 @@ def time_training_steps(config, steps=100, seed=0):
     return (time.time() - t0) / steps
 
 
-def plot_attention(model, indices, path, layer=-1, max_words=14):
+def plot_attention(model, indices, path, layer=-1, max_words=14, source="CNN"):
     """For each test image: the image and the cross-attention map (averaged over heads; `layer`
     = block index, or "mean" over blocks) used to generate each word, upsampled to 64 x 64."""
     import matplotlib.pyplot as plt
@@ -148,7 +149,7 @@ def plot_attention(model, indices, path, layer=-1, max_words=14):
             ax.imshow(a, cmap="jet", alpha=0.5)
             ax.set_title(word, fontsize=8)
     title = "mean over blocks" if layer == "mean" else f"block {layer % len(weights) + 1} of {len(weights)}"
-    fig.suptitle(f"Cross-attention over the 8 × 8 CNN grid when generating each word "
+    fig.suptitle(f"Cross-attention over the {model.grid_size} × {model.grid_size} {source} grid when generating each word "
                  f"({title}, mean over heads; greedy decoding, seed 0)", fontsize=8)
     fig.savefig(path, dpi=150)
     plt.close(fig)
@@ -259,5 +260,15 @@ def main():
                    "comparison": comparison, "attention": att, "attention_images": picks}, f, indent=1)
 
 
+def report_figure():
+    """Smaller attention figure for the report (3 of the 6 images; run after main())."""
+    with open(os.path.join(OUT, "summary.json")) as f:
+        picks = json.load(f)["attention_images"]          # airplane, dog, elephant, giraffe, motorcycle, truck
+    model = load_captioner(FINAL, 0)
+    plot_attention(model, [picks[0], picks[3], picks[5]], os.path.join(FIG, "attention_report.pdf"),
+                   max_words=11)
+
+
 if __name__ == "__main__":
-    main()
+    import sys
+    report_figure() if "--report-figure" in sys.argv else main()

@@ -60,7 +60,8 @@ def extended_synonyms():
 @torch.no_grad()
 def encoder_features(encoder, split):
     encoder.eval()
-    device = next(encoder.parameters()).device
+    params = list(encoder.parameters())   # (a cached pretrained encoder of Q4.2 has none)
+    device = params[0].device if params else device_for_captioning()
     return torch.cat([encoder.features(x.to(device)).cpu() for x, _ in image_loader(split)])
 
 

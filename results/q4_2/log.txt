@@ -1,0 +1,104 @@
+== 1. encoders: cost and linear-probe accuracy ==
+W1125 17:12:59.749000 85663 site-packages/torch/distributed/elastic/multiprocessing/redirects.py:35] NOTE: Redirects are currently not supported in MacOs.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/200 [00:00<?, ?it/s]Loading weights: 100%|██████████| 200/200 [00:00<00:00, 33562.49it/s]
+[transformers] [1mCLIPVisionModelWithProjection LOAD REPORT[0m from: openai/clip-vit-base-patch32
+Key                                                          | Status     |  | 
+-------------------------------------------------------------+------------+--+-
+text_model.encoder.layers.{0...11}.layer_norm1.bias          | UNEXPECTED |  | 
+text_model.encoder.layers.{0...11}.layer_norm2.bias          | UNEXPECTED |  | 
+text_model.encoder.layers.{0...11}.self_attn.out_proj.weight | UNEXPECTED |  | 
+text_model.encoder.layers.{0...11}.self_attn.q_proj.weight   | UNEXPECTED |  | 
+text_model.encoder.layers.{0...11}.mlp.fc2.weight            | UNEXPECTED |  | 
+text_model.encoder.layers.{0...11}.layer_norm2.weight        | UNEXPECTED |  | 
+text_model.encoder.layers.{0...11}.layer_norm1.weight        | UNEXPECTED |  | 
+text_model.encoder.layers.{0...11}.mlp.fc2.bias              | UNEXPECTED |  | 
+text_model.encoder.layers.{0...11}.mlp.fc1.weight            | UNEXPECTED |  | 
+text_model.encoder.layers.{0...11}.self_attn.k_proj.weight   | UNEXPECTED |  | 
+text_model.embeddings.token_embedding.weight                 | UNEXPECTED |  | 
+text_model.encoder.layers.{0...11}.mlp.fc1.bias              | UNEXPECTED |  | 
+text_model.encoder.layers.{0...11}.self_attn.k_proj.bias     | UNEXPECTED |  | 
+text_model.encoder.layers.{0...11}.self_attn.out_proj.bias   | UNEXPECTED |  | 
+text_model.encoder.layers.{0...11}.self_attn.q_proj.bias     | UNEXPECTED |  | 
+text_model.encoder.layers.{0...11}.self_attn.v_proj.weight   | UNEXPECTED |  | 
+text_model.encoder.layers.{0...11}.self_attn.v_proj.bias     | UNEXPECTED |  | 
+text_model.final_layer_norm.weight                           | UNEXPECTED |  | 
+logit_scale                                                  | UNEXPECTED |  | 
+text_model.embeddings.position_embedding.weight              | UNEXPECTED |  | 
+text_projection.weight                                       | UNEXPECTED |  | 
+text_model.final_layer_norm.bias                             | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+our CNN                params   1,175,786 | 0.42 GFLOPs/image (64 x 64) | extraction nan s | linear probe test acc 69.8 ± 1.1 %
+ResNet-50 (ImageNet)   params  23,508,032 | 8.17 GFLOPs/image (224 x 224 (upsampled)) | extraction 78 s | linear probe test acc 89.9 ± 0.1 %
+CLIP ViT-B/32          params  87,849,216 | 8.82 GFLOPs/image (224 x 224 (upsampled)) | extraction 63 s | linear probe test acc 96.7 ± 0.2 %
+
+== 2. captioners with pretrained (frozen) encoders ==
+[resnet50 gru         seed 0] val loss 2.341 (ppl 10.4) | BLEU-4 val 21.38 test 22.07 | class mention test 89.9% | len 10.8 | best epoch 4
+[resnet50 gru         seed 1] val loss 2.343 (ppl 10.4) | BLEU-4 val 22.13 test 21.53 | class mention test 91.5% | len 10.8 | best epoch 4
+[resnet50 gru         seed 2] val loss 2.339 (ppl 10.4) | BLEU-4 val 22.61 test 21.89 | class mention test 90.4% | len 11.0 | best epoch 4
+[clip     gru         seed 0] val loss 2.235 (ppl 9.3) | BLEU-4 val 27.37 test 25.34 | class mention test 95.4% | len 10.5 | best epoch 6
+[clip     gru         seed 1] val loss 2.241 (ppl 9.4) | BLEU-4 val 26.18 test 25.30 | class mention test 95.0% | len 10.5 | best epoch 6
+[clip     gru         seed 2] val loss 2.231 (ppl 9.3) | BLEU-4 val 26.36 test 25.84 | class mention test 95.4% | len 10.7 | best epoch 5
+[resnet50 transformer seed 0] val loss 2.309 (ppl 10.1) | BLEU-4 val 22.51 test 22.45 | class mention test 90.5% | len 10.6 | best epoch 5
+[resnet50 transformer seed 1] val loss 2.308 (ppl 10.1) | BLEU-4 val 21.61 test 21.08 | class mention test 89.2% | len 10.6 | best epoch 6
+[resnet50 transformer seed 2] val loss 2.298 (ppl 10.0) | BLEU-4 val 21.04 test 20.49 | class mention test 88.8% | len 10.8 | best epoch 5
+[clip     transformer seed 0] val loss 2.197 (ppl 9.0) | BLEU-4 val 27.97 test 26.68 | class mention test 94.0% | len 10.7 | best epoch 7
+[clip     transformer seed 1] val loss 2.195 (ppl 9.0) | BLEU-4 val 27.01 test 26.62 | class mention test 94.6% | len 10.6 | best epoch 6
+[clip     transformer seed 2] val loss 2.192 (ppl 9.0) | BLEU-4 val 26.89 test 27.72 | class mention test 95.5% | len 10.8 | best epoch 7
+
+== 3. comparison (test unless stated; mean ± std over 3 seeds) ==
+our CNN                + gru         | val ppl 11.94 ± 0.07 | BLEU-4 greedy val 14.91 ± 0.72 test 14.02 ± 0.83 | beam 5 val 17.15 ± 0.78 test 16.27 ± 0.41 | mention 68.6 ± 0.6% | distinct captions 415 | bigrams 534 | len 10.96 | best epochs [8, 5, 7] | 51 ms/step | 269 s to best epoch
+ResNet-50 (ImageNet)   + gru         | val ppl 10.39 ± 0.02 | BLEU-4 greedy val 22.04 ± 0.62 test 21.83 ± 0.27 | beam 5 val 26.75 ± 0.68 test 25.66 ± 0.65 | mention 90.6 ± 0.8% | distinct captions 728 | bigrams 910 | len 10.86 | best epochs [4, 4, 4] | 33 ms/step | 76 s to best epoch
+CLIP ViT-B/32          + gru         | val ppl 9.35 ± 0.04 | BLEU-4 greedy val 26.64 ± 0.64 test 25.49 ± 0.30 | beam 5 val 30.71 ± 0.18 test 29.14 ± 0.74 | mention 95.3 ± 0.2% | distinct captions 759 | bigrams 1049 | len 10.56 | best epochs [6, 6, 5] | 32 ms/step | 124 s to best epoch
+our CNN                + transformer | val ppl 11.06 ± 0.03 | BLEU-4 greedy val 15.47 ± 0.52 test 14.11 ± 0.22 | beam 5 val 18.20 ± 1.10 test 16.93 ± 0.94 | mention 67.1 ± 0.7% | distinct captions 447 | bigrams 562 | len 10.76 | best epochs [7, 7, 7] | 71 ms/step | 303 s to best epoch
+ResNet-50 (ImageNet)   + transformer | val ppl 10.02 ± 0.06 | BLEU-4 greedy val 21.72 ± 0.74 test 21.34 ± 1.01 | beam 5 val 26.65 ± 0.20 test 25.40 ± 0.50 | mention 89.5 ± 0.9% | distinct captions 797 | bigrams 1037 | len 10.66 | best epochs [5, 6, 5] | 74 ms/step | 195 s to best epoch
+CLIP ViT-B/32          + transformer | val ppl 8.98 ± 0.02 | BLEU-4 greedy val 27.29 ± 0.59 test 27.01 ± 0.62 | beam 5 val 31.36 ± 1.04 test 30.74 ± 0.51 | mention 94.7 ± 0.8% | distinct captions 789 | bigrams 1107 | len 10.70 | best epochs [7, 6, 7] | 71 ms/step | 229 s to best epoch
+
+== 4. examples (seed 0, greedy, test) ==
+#632 (airplane) ref: two airplanes sitting on the air field another going down the runway
+    CNN+GRU      a black and white photo of a black and white photo of a man and a woman
+    ResNet+GRU   a large airplane is sitting on a beach .
+    CLIP+GRU     a jet airplane is parked on the runway .
+    CLIP+Transf. a large passenger jet sitting on top of an airport runway .
+#147 (airplane) ref: An airplane is flying in the sky at dusk.
+    CNN+GRU      a black and white cat sitting on top of a grass field .
+    ResNet+GRU   a large jetliner flying through a blue sky .
+    CLIP+GRU     a large airplane flying through a clear sky .
+    CLIP+Transf. a large airplane is flying through the sky .
+#315 (horse) ref: Horses are pulling a plow guided by cowboys
+    CNN+GRU      a man riding a horse drawn carriage on a city street .
+    ResNet+GRU   a man and woman are riding horses in a field .
+    CLIP+GRU     a group of horses tethered to a rope in a field .
+    CLIP+Transf. a group of horses are standing in a field .
+#808 (elephant) ref: Two elephants facing each other with trunks overlapping.
+    CNN+GRU      a dog with a hat on its head
+    ResNet+GRU   a large elephant standing next to a baby elephant .
+    CLIP+GRU     two elephants are standing together in the dirt .
+    CLIP+Transf. two elephants are standing in the middle of the street .
+#44 (horse) ref: A man is standing in front of joined horses
+    CNN+GRU      a large white airplane sitting on top of a runway .
+    ResNet+GRU   a man is sitting on a bed with a hat
+    CLIP+GRU     a man in a uniform is standing next to a horse .
+    CLIP+Transf. a man is sitting on a horse in a cart .
+#37 (horse) ref: An equestrian in riding clothes jumps a horse over a post
+    CNN+GRU      a man riding a horse in front of a building .
+    ResNet+GRU   a woman is riding a horse in a stable .
+    CLIP+GRU     a woman riding a horse jumping over a pole
+    CLIP+Transf. a man riding a horse in a competition .
+#675 (elephant) ref: A man looking after an elephant in some exotic country.
+    CNN+GRU      a group of elephants standing next to each other .
+    ResNet+GRU   a man and woman are standing next to an elephant .
+    CLIP+GRU     an elephant is standing in the dirt with a man in the background .
+    CLIP+Transf. a man is walking next to an elephant .
+#775 (bus) ref: A bicyclist is riding past a bus that is parked.
+    CNN+GRU      a bus is parked on the side of the street .
+    ResNet+GRU   a bus is parked on the side of the road .
+    CLIP+GRU     a public transit bus on a city street
+    CLIP+Transf. a bus is driving down the street with people .
+saved /Users/psi/code/uni/deep-learning/figures/q4_2/examples.pdf
+
+== 5. CLIP cross-attention (Transformer, seed 0) ==
+attention entropy (uniform = log 49 = 3.89) and mean max weight (uniform = 0.020) per block: {'block1': {'entropy': 3.028, 'max_weight': 0.182}, 'block2': {'entropy': 2.942, 'max_weight': 0.188}, 'block3': {'entropy': 3.032, 'max_weight': 0.175}}
+saved /Users/psi/code/uni/deep-learning/figures/q4_2/attention_clip.pdf

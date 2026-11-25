@@ -302,14 +302,14 @@ class TransformerCaptioner(CaptionDecoding):
 
     Image: the CNN encoder without its last max pooling (and without global average pooling)
     gives a grid of feature vectors, (64 / 2^(blocks - 1))^2 = 8 x 8 = 64 regions of 256 channels
-    for our CNN; each is projected to d_model and gets a learned position embedding of its region.
+    for our CNN (other encoders provide grid(images) -> (B, R, C), grid_size and grid_dim); each is projected to d_model and gets a learned position embedding of its region.
     Caption: token embedding + learned position embedding, `n_layers` DecoderBlocks, final
     LayerNorm, and an output layer that shares its weights with the token embedding (as in
     GPT-2). Padding needs no mask: with causal attention a real token never attends to the <pad>
     tokens after the caption, and the loss ignores the <pad> targets.
 
     Args:
-        encoder: a CNN (models.CNN)
+        encoder: a CNN (models.CNN) or an encoder with grid(), grid_size, grid_dim
         vocab_size, pad_id, bos_id, eos_id: as for Captioner
         d_model, n_layers, n_heads, d_ff: decoder size
         dropout: dropout on embeddings, attention weights and residual branches
@@ -321,17 +321,20 @@ class TransformerCaptioner(CaptionDecoding):
     def __init__(self, encoder, vocab_size, pad_id, bos_id, eos_id, d_model=256, n_layers=3,
                  n_heads=4, d_ff=1024, dropout=0.1, max_len=64, image_size=64, freeze_encoder=True):
         super().__init__()
-        if not isinstance(encoder, CNN):
-            raise TypeError("TransformerCaptioner needs a CNN encoder (grid of features)")
         self.encoder = encoder
         self.freeze_encoder = freeze_encoder
         if freeze_encoder:
             for p in self.encoder.parameters():
                 p.requires_grad_(False)
         self.pad_id, self.bos_id, self.eos_id = pad_id, bos_id, eos_id
-        n_pools = sum(isinstance(m, nn.MaxPool2d) for m in encoder.conv)
-        self.grid_size = image_size // 2 ** (n_pools - 1)
-        self.img_proj = nn.Linear(encoder.feature_dim, d_model)
+        if isinstance(encoder, CNN):
+            n_pools = sum(isinstance(m, nn.MaxPool2d) for m in encoder.conv)
+            self.grid_size, grid_dim = image_size // 2 ** (n_pools - 1), encoder.feature_dim
+        elif hasattr(encoder, "grid"):          # e.g. a pretrained encoder (Part 4.2)
+            self.grid_size, grid_dim = encoder.grid_size, encoder.grid_dim
+        else:
+            raise TypeError("TransformerCaptioner needs a CNN or an encoder with a grid() method")
+        self.img_proj = nn.Linear(grid_dim, d_model)
         self.img_pos = nn.Parameter(0.02 * torch.randn(1, self.grid_size ** 2, d_model))
         self.embed = nn.Embedding(vocab_size, d_model, padding_idx=pad_id)
         nn.init.normal_(self.embed.weight, std=0.02)
@@ -345,7 +348,9 @@ class TransformerCaptioner(CaptionDecoding):
         self.drop = nn.Dropout(dropout)
 
     def grid(self, images):
-        """CNN feature grid (B, R, C), R = grid_size^2 regions in row-major order."""
+        """Feature grid (B, R, C), R = grid_size^2 regions in row-major order."""
+        if not isinstance(self.encoder, CNN):
+            return self.encoder.grid(images)
         g = self.encoder.conv[:-1](images)                       # without the last max pooling
         return g.flatten(2).transpose(1, 2)
 

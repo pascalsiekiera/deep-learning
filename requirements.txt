@@ -4,3 +4,4 @@ matplotlib
 tqdm
 pyarrow
 pillow
+transformers  # only for Q4.2 (CLIP image encoder)

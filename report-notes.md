@@ -796,3 +796,57 @@ Code: `DecoderBlock`, `TransformerCaptioner` in `models.py` (greedy and beam sea
 
   In the last block, the attention is most focused when the model generates the first word and the class word (max weight 0.16 / 0.14, 9–10× uniform) and most diffuse for function words (0.075). Block 1 is sharply focused for all tokens alike (entropy 2.8–3.3), i.e. its attention does not depend much on the word; the word-specific attention appears in the last block.
 - Caveat: attention weights show where the model reads from, not necessarily what causes its prediction; the grid is coarse (8 × 8 regions of a 64 × 64 image, and each CNN feature has a large receptive field).
+
+## Q4.2 Pretrained models
+
+Code: `pretrained.py` (backbones, feature store, `CachedEncoder`), encoder names `"resnet50"` / `"clip"` in `captioning.build_captioner`; script `python -m tasks.q4_2.pretrained` (log `results/q4_2/log.txt`, summary `results/q4_2/summary.json`, figures `figures/q4_2/{examples,attention_clip}.pdf`). Needs `transformers` (CLIP only); weights are downloaded on first use (ResNet-50 ~100 MB, CLIP ~600 MB for the vision part, the checkpoint file is 1.1 GB).
+
+**Setup**
+- **Pretrained encoders (frozen, used as image encoders only):**
+  - **ResNet-50**, supervised on ImageNet-1k (torchvision `IMAGENET1K_V2`). Image vector = global average pooling of the last stage (2048-d); grid = its 7 × 7 × 2048 map.
+  - **CLIP ViT-B/32** image encoder (Radford et al. 2021; `openai/clip-vit-base-patch32` via Hugging Face `transformers`), trained contrastively on 400M image–text pairs from the web. Image vector = CLIP's projected image embedding (512-d, the vector that CLIP aligns with text); grid = the 7 × 7 patch tokens of the last layer (768-d, after the final LayerNorm).
+  - Compared with **our CNN** of Q2.5 (frozen, the same encoder as in Q3.2 / Q4.1).
+- **Input:** our 64 × 64 images are mapped back to [0, 1], upsampled bicubically to 224 × 224 (the resolution the models were trained at) and normalized with each model's own statistics. Upsampling adds no information; it only matches the input size the pretrained filters expect.
+- **Decoders:** our GRU of Q3.2 (h₀ from the image vector, image vector at every step) and our Transformer of Q4.1 (cross-attention to the 7 × 7 grid), with **exactly the hyperparameters selected for our CNN** (no new tuning; same protocol: ≤ 20 epochs, early stopping on val loss with patience 4, seeds 0, 1, 2). The comparison therefore changes only the encoder. Caveat: the decoders might do even better with settings tuned for the new features (e.g. the pretrained runs reach their best epoch earlier).
+- **Feature caching:** a frozen encoder in eval mode maps each image to fixed features, so the features of all 8,500 images are computed once (78 s for ResNet-50, 63 s for CLIP on the Apple GPU) and looked up during training/decoding (an image is identified by 32 fixed pixel values; all fingerprints checked unique). Check: the looked-up image vectors are bit-identical to a live forward pass; the grid is stored in float16 (max. abs. difference 0.015 / 0.008 at feature scale 0.09 / 0.56).
+
+**Encoders: size, cost, class information**
+
+| Encoder | Parameters | GFLOPs / image | Input | Pretraining data | Linear-probe test acc. |
+|---|---|---|---|---|---|
+| our CNN (Q2.5) | 1,175,786 | 0.42 | 64 × 64 | our 6,500 labelled training images | 69.8 ± 1.1 % |
+| ResNet-50 | 23,508,032 | 8.17 | 224 × 224 | ImageNet-1k, 1.28M labelled images | **89.9 ± 0.1 %** |
+| CLIP ViT-B/32 | 87,849,216 | 8.82 | 224 × 224 | 400M web image–text pairs | **96.7 ± 0.2 %** |
+
+(GFLOPs counted with `torch.utils.flop_counter`, 1 multiply-add = 2 FLOPs, upsampling not counted. ResNet-50 parameters without the ImageNet classification layer. Linear probe as in Q3.3 (b): softmax regression on the standardized frozen image vectors, epoch chosen on validation, 3 probe seeds.)
+
+**Captioning results** (test unless stated; mean ± std over 3 seeds)
+
+| Encoder + decoder | Val ppl | BLEU-4 greedy (val / test) | BLEU-4 beam 5 (val / test) | Class mention | Distinct captions | Distinct bigrams | Best epochs | ms / step | s to best epoch |
+|---|---|---|---|---|---|---|---|---|---|
+| our CNN + GRU (Q3.2) | 11.94 ± 0.07 | 14.91 / 14.02 ± 0.83 | 17.15 / 16.27 ± 0.41 | 68.6 ± 0.6 % | 415 | 534 | 8, 5, 7 | 51 | 269 |
+| ResNet-50 + GRU | 10.39 ± 0.02 | 22.04 / 21.83 ± 0.27 | 26.75 / 25.66 ± 0.65 | 90.6 ± 0.8 % | 728 | 910 | 4, 4, 4 | 33 | 76 |
+| CLIP + GRU | 9.35 ± 0.04 | 26.64 / 25.49 ± 0.30 | 30.71 / 29.14 ± 0.74 | **95.3 ± 0.2 %** | 759 | 1,049 | 6, 6, 5 | 32 | 124 |
+| our CNN + Transformer (Q4.1) | 11.06 ± 0.03 | 15.47 / 14.11 ± 0.22 | 18.20 / 16.93 ± 0.94 | 67.1 ± 0.7 % | 447 | 562 | 7, 7, 7 | 71 | 303 |
+| ResNet-50 + Transformer | 10.02 ± 0.06 | 21.72 / 21.34 ± 1.01 | 26.65 / 25.40 ± 0.50 | 89.5 ± 0.9 % | 797 | 1,037 | 5, 6, 5 | 74 | 195 |
+| **CLIP + Transformer** | **8.98 ± 0.02** | **27.29 / 27.01 ± 0.62** | **31.36 / 30.74 ± 0.51** | 94.7 ± 0.8 % | 789 | 1,107 | 7, 6, 7 | 71 | 229 |
+
+(ms / step: one training step timed in the same session for all six; for the pretrained encoders the features are looked up, for our CNN it is computed in every step, which is why the CNN + GRU step is slower than the cached ones. Human references: class mention 95.4 %.)
+
+**Findings**
+- **The encoder is the bottleneck.** Swapping our CNN for a pretrained encoder nearly doubles BLEU-4 (greedy test: 14.0 → 21.8 with ResNet-50 → 25.5 with CLIP, GRU decoder; beam 5: 16.3 → 25.7 → 29.1). These are by far the largest differences in the whole project (2·SE ≈ 1–2). All tuning of the decoder (Q3.2, Q4.1) or the decoding (Q3.4) moved BLEU by only 1–3 points.
+- **Class information explains a large part:** class mention 68.6 → 90.6 → 95.3 % follows the linear-probe accuracy 69.8 → 89.9 → 96.7 %, as in Q3.3 (b) (frozen encoder: caption names the class about as often as a linear classifier on the image vector gets it right). With CLIP the captioners name the right class as often as the human annotators (95.4 %).
+- **But not all:** CLIP is better than ResNet-50 by +3.7 BLEU (greedy, GRU) while class mention rises by only 4.7 points and was already at 90 %. CLIP was trained to match images with free-form text, so its features also encode what captions talk about beyond the class: counts ("two elephants" for #808, where our CNN said "a dog with a hat on its head"), actions ("a woman riding a horse jumping over a pole" for the show-jumping image #37), other objects and people ("a man in a uniform is standing next to a horse", "a group of horses tethered to a rope in a field"). ResNet-50 was trained only to name 1,000 object categories. (`figures/q4_2/examples.pdf`: the 4 worst and 4 random test images of Q3.2 with the captions of four systems.)
+- **Better language model, too:** val perplexity 11.9 → 10.4 → 9.3 (GRU); the reference captions are much more predictable given a good image representation.
+- **Much more diverse captions:** distinct test captions 415 → 728–797 (of 1,000), distinct bigrams 534 → 910–1,107. With a reliable image representation the decoder does not need to fall back to the generic templates of each class (Q3.2 typical error (i)).
+- **Transformer vs GRU now depends on the encoder:** with CLIP the Transformer is meaningfully better (greedy +1.5, 2·SE ≈ 0.8; beam 5 +1.6, 2·SE ≈ 1.0; val ppl 8.98 vs 9.35). With ResNet-50 (−0.5) and with our CNN (+0.1, Q4.1) there is no difference. The CLIP patch tokens are a richer grid to attend to (each token is already contextualized by self-attention over the whole image), so cross-attention pays off only when the grid carries more than the pooled vector.
+- **Where the gains come from (summary):** (i) **data**: the pretrained encoders learned from 1.28M (ResNet) or 400M (CLIP) images instead of our 6,500; (ii) **the training signal**: CLIP's language supervision gives features that match captions better than ImageNet labels; (iii) **capacity and input resolution** (23–88M parameters, 224 × 224 input with the upsampled image) are what make use of that data, but by themselves add no information about our images. Not the decoder: the same decoders with the same hyperparameters were used.
+- **Computational cost:**
+  - **Inference:** about 20× more compute per image for the encoder (8.2–8.8 vs 0.42 GFLOPs) and 20–75× more parameters (23.5M / 87.8M vs 1.2M). For 8,500 images this was 63–78 s on the laptop GPU.
+  - **Training our captioners became cheaper:** with frozen, cached features a training step is faster than with our CNN computed on the fly (32–33 vs 51 ms, GRU), and the best epoch is reached sooner (76–124 s vs 269 s for the GRU).
+  - **Pretraining (not paid by us):** ImageNet training of ResNet-50 and especially CLIP's training on 400M pairs cost orders of magnitude more compute than our whole project; we reuse it for free. Disk: 1.2 GB of downloaded weights, 2.4 GB of cached features.
+- **Cross-attention with CLIP** (`figures/q4_2/attention_clip.pdf`, same 6 test images as in Q4.1, last block): the attention is sharper than with our CNN (entropy 2.9–3.0 of uniform log 49 = 3.89 in all blocks, mean max weight 0.18 = 9× uniform) and follows the words: "plane" → the plane's nose, "dog" → the dog's face behind the window, "giraffes" → the two giraffes, "woman" → the person standing on the red truck. The captions are also more specific ("an old propeller plane parked on a runway", "a dog is looking out of the window", "a red truck with a woman standing on the back of it"). A remaining error: "an elephant standing behind a fence behind a fence" (repetition). For `<eos>` the attention often goes to a background corner/sky patch.
+- **Caveats:**
+  - The decoders were not re-tuned for the new features.
+  - We cannot rule out that CLIP's web training data contain COCO images or similar captions (its data are not public); ImageNet contains no COCO images but has many of our classes (several dog breeds, airliners, trucks, …), so ResNet-50 has seen many more examples of these classes.
+  - Off-the-shelf captioning models (e.g. BLIP) were not used.
